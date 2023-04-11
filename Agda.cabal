@@ -686,6 +686,7 @@ library
       Agda.TypeChecking.Rules.Record
       Agda.TypeChecking.Rules.Term
       Agda.TypeChecking.Serialise
+      Agda.TypeChecking.Serialise.Arrays
       Agda.TypeChecking.Serialise.Base
       Agda.TypeChecking.Serialise.Instances
       Agda.TypeChecking.Serialise.Instances.Abstract
