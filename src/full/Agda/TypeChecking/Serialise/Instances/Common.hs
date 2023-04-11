@@ -43,6 +43,7 @@ import Agda.Interaction.FindFile
 import Agda.Interaction.Library
 
 import Agda.TypeChecking.Serialise.Base
+import Agda.TypeChecking.Serialise.Arrays
 
 import Agda.Utils.BiMap (BiMap)
 import qualified Agda.Utils.BiMap as BiMap
@@ -83,9 +84,9 @@ instance EmbPrj Word64 where
           int32 :: Word64 -> Int32
           int32 = fromIntegral
 
-  value = vcase valu where
-    valu [a, b] = return $ n * mod (fromIntegral a) n + mod (fromIntegral b) n
-    valu _      = malformed
+  value = vcase' valu where
+    valu (NodeArr (a, b)) = return $ n * mod (fromIntegral a) n + mod (fromIntegral b) n
+    valu _                = malformed
     n = 2^32
 
 instance EmbPrj Int32 where
@@ -129,18 +130,18 @@ instance (EmbPrj a, EmbPrj b) => EmbPrj (Either a b) where
   icod_ (Left  x) = icodeN 0 Left x
   icod_ (Right x) = icodeN 1 Right x
 
-  value = vcase valu where
-    valu [0, x] = valuN Left  x
-    valu [1, x] = valuN Right x
+  value = vcase' valu where
+    valu (NodeArr (0, x)) = valuN Left  x
+    valu (NodeArr (1, x)) = valuN Right x
     valu _   = malformed
 
 instance EmbPrj a => EmbPrj (Maybe a) where
   icod_ Nothing  = icodeN' Nothing
   icod_ (Just x) = icodeN' Just x
 
-  value = vcase valu where
-    valu []  = valuN Nothing
-    valu [x] = valuN Just x
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN Nothing
+    valu (NodeAr1 x)  = valuN Just x
     valu _   = malformed
 
 instance EmbPrj a => EmbPrj (Strict.Maybe a) where
@@ -196,8 +197,8 @@ instance {-# OVERLAPPABLE #-} EmbPrj a => EmbPrj [a] where
   value    = vcase (mapM value)
 --   icode []       = icode0'
 --   icode (x : xs) = icode2' x xs
---   value = vcase valu where valu []      = valu0 []
---                            valu [x, xs] = valu2 (:) x xs
+--   value = vcase valu where valu (NodeArr ())      = valu0 []
+--                            valu (NodeArr (x, xs)) = valu2 (:) x xs
 --                            valu _       = malformed
 
 instance EmbPrj a => EmbPrj (List1 a) where
@@ -297,45 +298,45 @@ instance EmbPrj C.Name where
   icod_ (C.NoName a b)     = icodeN 0 C.NoName a b
   icod_ (C.Name r nis xs)  = icodeN 1 C.Name r nis xs
 
-  value = vcase valu where
-    valu [0, a, b]       = valuN C.NoName a b
-    valu [1, r, nis, xs] = valuN C.Name   r nis xs
+  value = vcase' valu where
+    valu (NodeArr (0, a, b))       = valuN C.NoName a b
+    valu (NodeArr (1, r, nis, xs)) = valuN C.Name   r nis xs
     valu _               = malformed
 
 instance EmbPrj NamePart where
   icod_ Hole   = icodeN' Hole
   icod_ (Id a) = icodeN' Id a
 
-  value = vcase valu where
-    valu []  = valuN Hole
-    valu [a] = valuN Id a
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN Hole
+    valu (NodeAr1 a)  = valuN Id a
     valu _   = malformed
 
 instance EmbPrj NameInScope where
   icod_ InScope    = icodeN' InScope
   icod_ NotInScope = icodeN 0 NotInScope
 
-  value = vcase valu where
-    valu []  = valuN InScope
-    valu [0] = valuN NotInScope
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN InScope
+    valu (NodeAr1 0)  = valuN NotInScope
     valu _   = malformed
 
 instance EmbPrj C.QName where
   icod_ (Qual    a b) = icodeN' Qual a b
   icod_ (C.QName a  ) = icodeN' C.QName a
 
-  value = vcase valu where
-    valu [a, b] = valuN Qual    a b
-    valu [a]    = valuN C.QName a
+  value = vcase' valu where
+    valu (NodeArr (a, b)) = valuN Qual    a b
+    valu (NodeAr1 a)      = valuN C.QName a
     valu _      = malformed
 
 instance (EmbPrj a, EmbPrj b) => EmbPrj (ImportedName' a b) where
   icod_ (ImportedModule a) = icodeN 1 ImportedModule a
   icod_ (ImportedName a)   = icodeN 2 ImportedName a
 
-  value = vcase valu where
-    valu [1, a] = valuN ImportedModule a
-    valu [2, a] = valuN ImportedName a
+  value = vcase' valu where
+    valu (NodeArr (1, a)) = valuN ImportedModule a
+    valu (NodeArr (2, a)) = valuN ImportedName a
     valu _ = malformed
 
 instance EmbPrj Associativity where
@@ -343,19 +344,19 @@ instance EmbPrj Associativity where
   icod_ RightAssoc = icodeN 1 RightAssoc
   icod_ NonAssoc   = icodeN 2 NonAssoc
 
-  value = vcase valu where
-    valu []  = valuN LeftAssoc
-    valu [1] = valuN RightAssoc
-    valu [2] = valuN NonAssoc
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN LeftAssoc
+    valu (NodeAr1 1)  = valuN RightAssoc
+    valu (NodeAr1 2)  = valuN NonAssoc
     valu _   = malformed
 
 instance EmbPrj FixityLevel where
   icod_ Unrelated   = icodeN' Unrelated
   icod_ (Related a) = icodeN' Related a
 
-  value = vcase valu where
-    valu []  = valuN Unrelated
-    valu [a] = valuN Related a
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN Unrelated
+    valu (NodeAr1 a)  = valuN Related a
     valu _   = malformed
 
 instance EmbPrj Fixity where
@@ -379,11 +380,11 @@ instance EmbPrj NotationPart where
   icod_ (WildPart a)   = icodeN 2 WildPart a
   icod_ (IdPart a)     = icodeN' IdPart a
 
-  value = vcase valu where
-    valu [0, a, b] = valuN VarPart a b
-    valu [1, a, b] = valuN HolePart a b
-    valu [2, a]    = valuN WildPart a
-    valu [a]       = valuN IdPart a
+  value = vcase' valu where
+    valu (NodeArr (0, a, b)) = valuN VarPart a b
+    valu (NodeArr (1, a, b)) = valuN HolePart a b
+    valu (NodeArr (2, a))    = valuN WildPart a
+    valu (NodeAr1 a)         = valuN IdPart a
     valu _         = malformed
 
 instance EmbPrj MetaId where
@@ -458,9 +459,9 @@ instance EmbPrj a => EmbPrj (HasEta' a) where
   icod_ YesEta    = icodeN' YesEta
   icod_ (NoEta a) = icodeN' NoEta a
 
-  value = vcase valu where
-    valu []  = valuN YesEta
-    valu [a] = valuN NoEta a
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN YesEta
+    valu (NodeAr1 a)  = valuN NoEta a
     valu _   = malformed
 
 instance EmbPrj PatternOrCopattern
@@ -469,9 +470,9 @@ instance EmbPrj Induction where
   icod_ Inductive   = icodeN' Inductive
   icod_ CoInductive = icodeN 1 CoInductive
 
-  value = vcase valu where
-    valu []  = valuN Inductive
-    valu [1] = valuN CoInductive
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN Inductive
+    valu (NodeAr1 1)  = valuN CoInductive
     valu _   = malformed
 
 instance EmbPrj Hiding where
@@ -580,9 +581,9 @@ instance EmbPrj FreeVariables where
   icod_ UnknownFVs   = icodeN' UnknownFVs
   icod_ (KnownFVs a) = icodeN' KnownFVs a
 
-  value = vcase valu where
-    valu []  = valuN UnknownFVs
-    valu [a] = valuN KnownFVs a
+  value = vcase' valu where
+    valu (NodeArr ()) = valuN UnknownFVs
+    valu (NodeAr1 a)  = valuN KnownFVs a
     valu _   = malformed
 
 instance EmbPrj ConOrigin
@@ -598,32 +599,32 @@ instance EmbPrj Agda.Syntax.Literal.Literal where
   icod_ (LitMeta   a b) = icodeN 6 LitMeta a b
   icod_ (LitWord64 a)   = icodeN 7 LitWord64 a
 
-  value = vcase valu where
-    valu [a]       = valuN LitNat    a
-    valu [1, a]    = valuN LitFloat  a
-    valu [2, a]    = valuN LitString a
-    valu [3, a]    = valuN LitChar   a
-    valu [5, a]    = valuN LitQName  a
-    valu [6, a, b] = valuN LitMeta   a b
-    valu [7, a]    = valuN LitWord64 a
+  value = vcase' valu where
+    valu (NodeAr1 a)         = valuN LitNat    a
+    valu (NodeArr (1, a))    = valuN LitFloat  a
+    valu (NodeArr (2, a))    = valuN LitString a
+    valu (NodeArr (3, a))    = valuN LitChar   a
+    valu (NodeArr (5, a))    = valuN LitQName  a
+    valu (NodeArr (6, a, b)) = valuN LitMeta   a b
+    valu (NodeArr (7, a))    = valuN LitWord64 a
     valu _            = malformed
 
 instance EmbPrj IsAbstract where
   icod_ AbstractDef = icodeN 0 AbstractDef
   icod_ ConcreteDef = icodeN' ConcreteDef
 
-  value = vcase valu where
-    valu [0] = valuN AbstractDef
-    valu []  = valuN ConcreteDef
+  value = vcase' valu where
+    valu (NodeAr1 0)  = valuN AbstractDef
+    valu (NodeArr ()) = valuN ConcreteDef
     valu _   = malformed
 
 instance EmbPrj Delayed where
   icod_ Delayed    = icodeN 0 Delayed
   icod_ NotDelayed = icodeN' NotDelayed
 
-  value = vcase valu where
-    valu [0] = valuN Delayed
-    valu []  = valuN NotDelayed
+  value = vcase' valu where
+    valu (NodeAr1 0)  = valuN Delayed
+    valu (NodeArr ()) = valuN NotDelayed
     valu _   = malformed
 
 instance EmbPrj SrcLoc where
@@ -639,19 +640,19 @@ instance EmbPrj Impossible where
   icod_ (Unreachable a)             = icodeN 1 Unreachable a
   icod_ (ImpMissingDefinitions a b) = icodeN 2 ImpMissingDefinitions a b
 
-  value = vcase valu where
-    valu [0, a]    = valuN Impossible  a
-    valu [1, a]    = valuN Unreachable a
-    valu [2, a, b] = valuN ImpMissingDefinitions a b
+  value = vcase' valu where
+    valu (NodeArr (0, a))    = valuN Impossible  a
+    valu (NodeArr (1, a))    = valuN Unreachable a
+    valu (NodeArr (2, a, b)) = valuN ImpMissingDefinitions a b
     valu _         = malformed
 
 instance EmbPrj ExpandedEllipsis where
   icod_ NoEllipsis = icodeN' NoEllipsis
   icod_ (ExpandedEllipsis a b) = icodeN 1 ExpandedEllipsis a b
 
-  value = vcase valu where
-    valu []      = valuN NoEllipsis
-    valu [1,a,b] = valuN ExpandedEllipsis a b
+  value = vcase' valu where
+    valu (NodeArr ())      = valuN NoEllipsis
+    valu (NodeArr (1,a,b)) = valuN ExpandedEllipsis a b
     valu _       = malformed
 
 instance EmbPrj OptionsPragma where

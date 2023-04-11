@@ -105,7 +105,7 @@ instance GIntTuple U1 where
 
 instance (GIntTuple f, GIntTuple g) => GIntTuple (f :*: g) where
   gSize _ = gSize (Proxy :: Proxy f) + gSize (Proxy :: Proxy g)
-  gOfArray offset arr = gOfArray offset arr :*: gOfArray (offset + gSize (Proxy :: Proxy g)) arr
+  gOfArray offset arr = gOfArray offset arr :*: gOfArray (offset + gSize (Proxy :: Proxy f)) arr
 
 instance c ~ Int32 => GIntTuple (K1 i c) where
   gSize _ = 1
