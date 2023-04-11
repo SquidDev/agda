@@ -154,7 +154,7 @@ data BindingSource
   | PatternBound -- ^ @f ... =@
   | LetBound     -- ^ @let ... in@
   | WithBound    -- ^ @| ... in q@
-  deriving (Show, Eq, Generic)
+  deriving (Show, Eq, Generic, Enum, Bounded)
 
 instance Pretty BindingSource where
   pretty = \case

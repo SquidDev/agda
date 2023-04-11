@@ -2207,7 +2207,7 @@ data FunctionFlag
   = FunStatic  -- ^ Should calls to this function be normalised at compile-time?
   | FunInline  -- ^ Should calls to this function be inlined by the compiler?
   | FunMacro   -- ^ Is this function a macro?
-  deriving (Eq, Ord, Enum, Show, Generic)
+  deriving (Eq, Ord, Enum, Bounded, Show, Generic)
 
 data CompKit = CompKit
   { nameOfHComp :: Maybe QName

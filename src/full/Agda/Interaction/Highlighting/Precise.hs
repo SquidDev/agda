@@ -181,7 +181,7 @@ instance Eq DefinitionSite where
 -- information from the lexer?
 
 data TokenBased = TokenBased | NotOnlyTokenBased
-  deriving (Eq, Show)
+  deriving (Eq, Show, Enum, Bounded)
 
 instance Eq Aspects where
   Aspects a o _ d t == Aspects a' o' _ d' t' =

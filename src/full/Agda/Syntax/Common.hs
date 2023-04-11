@@ -62,7 +62,7 @@ instance NFData Delayed
 ---------------------------------------------------------------------------
 
 data FileType = AgdaFileType | MdFileType | RstFileType | TexFileType | OrgFileType
-  deriving (Eq, Ord, Show, Generic)
+  deriving (Eq, Ord, Show, Enum, Bounded, Generic)
 
 instance Pretty FileType where
   pretty = \case
@@ -1525,7 +1525,7 @@ data Origin
   | CaseSplit    -- ^ Produced by an interactive case split.
   | Substitution -- ^ Named application produced to represent a substitution. E.g. "?0 (x = n)" instead of "?0 n"
   | ExpandedPun  -- ^ An expanded hidden argument pun.
-  deriving (Show, Eq, Ord)
+  deriving (Show, Eq, Ord, Enum, Bounded)
 
 instance HasRange Origin where
   getRange _ = noRange
