@@ -347,20 +347,6 @@ instance EmbPrj DoGeneralize where
   value _ = malformed
 
 instance EmbPrj Occurrence where
-  icod_ StrictPos = return 0
-  icod_ Mixed     = return 1
-  icod_ Unused    = return 2
-  icod_ GuardPos  = return 3
-  icod_ JustPos   = return 4
-  icod_ JustNeg   = return 5
-
-  value 0 = return StrictPos
-  value 1 = return Mixed
-  value 2 = return Unused
-  value 3 = return GuardPos
-  value 4 = return JustPos
-  value 5 = return JustNeg
-  value _ = malformed
 
 instance EmbPrj EtaEquality where
   icod_ (Specified a) = icodeN 0 Specified a
@@ -427,15 +413,6 @@ instance EmbPrj a => EmbPrj (SplitTree' a) where
     valu _            = malformed
 
 instance EmbPrj FunctionFlag where
-  icod_ FunStatic       = icodeN 0 FunStatic
-  icod_ FunInline       = icodeN 1 FunInline
-  icod_ FunMacro        = icodeN 2 FunMacro
-
-  value = vcase valu where
-    valu [0] = valuN FunStatic
-    valu [1] = valuN FunInline
-    valu [2] = valuN FunMacro
-    valu _   = malformed
 
 instance EmbPrj a => EmbPrj (WithArity a) where
   icod_ (WithArity a b) = icodeN' WithArity a b

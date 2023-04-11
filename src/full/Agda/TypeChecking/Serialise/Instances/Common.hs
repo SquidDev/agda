@@ -108,12 +108,7 @@ instance EmbPrj Void where
   icod_ = absurd
   value = vcase valu where valu _ = malformed
 
-instance EmbPrj () where
-  icod_ () = icodeN' ()
-
-  value = vcase valu where
-    valu [] = valuN ()
-    valu _  = malformed
+instance EmbPrj ()
 
 instance (EmbPrj a, EmbPrj b) => EmbPrj (a, b) where
   icod_ (a, b) = icodeN' (,) a b
@@ -152,29 +147,9 @@ instance EmbPrj a => EmbPrj (Strict.Maybe a) where
   icod_ m = icode (Strict.toLazy m)
   value m = Strict.toStrict `fmap` value m
 
-instance EmbPrj Bool where
-  icod_ True  = icodeN' True
-  icod_ False = icodeN 0 False
+instance EmbPrj Bool
 
-  value = vcase valu where
-    valu []  = valuN True
-    valu [0] = valuN False
-    valu _   = malformed
-
-instance EmbPrj FileType where
-  icod_ AgdaFileType = icodeN'  AgdaFileType
-  icod_ MdFileType   = icodeN 0 MdFileType
-  icod_ RstFileType  = icodeN 1 RstFileType
-  icod_ TexFileType  = icodeN 2 TexFileType
-  icod_ OrgFileType  = icodeN 3 OrgFileType
-
-  value = vcase $ \case
-    []  -> valuN AgdaFileType
-    [0] -> valuN MdFileType
-    [1] -> valuN RstFileType
-    [2] -> valuN TexFileType
-    [3] -> valuN OrgFileType
-    _   -> malformed
+instance EmbPrj FileType
 
 instance EmbPrj Cubical where
   icod_ CErased = icodeN'  CErased
@@ -316,9 +291,7 @@ instance EmbPrj SerialisedRange where
     icodeN' (undefined :: SrcFile -> [IntervalWithoutFile] -> SerialisedRange)
             (P.rangeFile r) (P.rangeIntervals r)
 
-  value = vcase valu where
-    valu [a, b] = SerialisedRange <$> valuN P.intervalsToRange a b
-    valu _      = malformed
+  value i = SerialisedRange <$> valueN P.intervalsToRange i
 
 instance EmbPrj C.Name where
   icod_ (C.NoName a b)     = icodeN 0 C.NoName a b
@@ -572,39 +545,19 @@ instance EmbPrj Quantity where
 --   value 2 = return Quantityω
 --   value _ = malformed
 
-instance EmbPrj Cohesion where
-  icod_ Flat       = return 0
-  icod_ Continuous = return 1
-  icod_ Squash     = return 2
-
-  value 0 = return Flat
-  value 1 = return Continuous
-  value 2 = return Squash
-  value _ = malformed
+instance EmbPrj Cohesion
 
 instance EmbPrj Modality where
   icod_ (Modality a b c) = icodeN' Modality a b c
 
-  value = vcase $ \case
-    [a, b, c] -> valuN Modality a b c
-    _ -> malformed
+  value = valueN Modality
 
-instance EmbPrj Relevance where
-  icod_ Relevant       = return 0
-  icod_ Irrelevant     = return 1
-  icod_ NonStrict      = return 2
-
-  value 0 = return Relevant
-  value 1 = return Irrelevant
-  value 2 = return NonStrict
-  value _ = malformed
+instance EmbPrj Relevance
 
 instance EmbPrj Annotation where
   icod_ (Annotation l) = icodeN' Annotation l
 
-  value = vcase $ \case
-    [l] -> valuN Annotation l
-    _ -> malformed
+  value = valueN Annotation
 
 instance EmbPrj Lock where
   icod_ IsNotLock          = pure 0
@@ -616,21 +569,7 @@ instance EmbPrj Lock where
   value 2 = pure (IsLock LockOLock)
   value _ = malformed
 
-instance EmbPrj Origin where
-  icod_ UserWritten = return 0
-  icod_ Inserted    = return 1
-  icod_ Reflected   = return 2
-  icod_ CaseSplit   = return 3
-  icod_ Substitution = return 4
-  icod_ ExpandedPun = return 5
-
-  value 0 = return UserWritten
-  value 1 = return Inserted
-  value 2 = return Reflected
-  value 3 = return CaseSplit
-  value 4 = return Substitution
-  value 5 = return ExpandedPun
-  value _ = malformed
+instance EmbPrj Origin
 
 instance EmbPrj a => EmbPrj (WithOrigin a) where
   icod_ (WithOrigin a b) = icodeN' WithOrigin a b
@@ -646,27 +585,9 @@ instance EmbPrj FreeVariables where
     valu [a] = valuN KnownFVs a
     valu _   = malformed
 
-instance EmbPrj ConOrigin where
-  icod_ ConOSystem = return 0
-  icod_ ConOCon    = return 1
-  icod_ ConORec    = return 2
-  icod_ ConOSplit  = return 3
+instance EmbPrj ConOrigin
 
-  value 0 = return ConOSystem
-  value 1 = return ConOCon
-  value 2 = return ConORec
-  value 3 = return ConOSplit
-  value _ = malformed
-
-instance EmbPrj ProjOrigin where
-  icod_ ProjPrefix  = return 0
-  icod_ ProjPostfix = return 1
-  icod_ ProjSystem  = return 2
-
-  value 0 = return ProjPrefix
-  value 1 = return ProjPostfix
-  value 2 = return ProjSystem
-  value _ = malformed
+instance EmbPrj ProjOrigin
 
 instance EmbPrj Agda.Syntax.Literal.Literal where
   icod_ (LitNat    a)   = icodeN' LitNat a

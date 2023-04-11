@@ -29,36 +29,19 @@ instance EmbPrj Scope where
 
   value = valueN Scope
 
-instance EmbPrj DataOrRecordModule where
-  icod_ IsDataModule   = icodeN' IsDataModule
-  icod_ IsRecordModule = icodeN 0 IsRecordModule
+instance EmbPrj DataOrRecordModule
 
-  value = vcase $ \case
-    []  -> valuN IsDataModule
-    [0] -> valuN IsRecordModule
-    _   -> malformed
-
-instance EmbPrj NameSpaceId where
-  icod_ PublicNS        = icodeN' PublicNS
-  icod_ PrivateNS       = icodeN 1 PrivateNS
-  icod_ ImportedNS      = icodeN 2 ImportedNS
-
-  value = vcase valu where
-    valu []  = valuN PublicNS
-    valu [1] = valuN PrivateNS
-    valu [2] = valuN ImportedNS
-    valu _   = malformed
+instance EmbPrj NameSpaceId
 
 instance EmbPrj Access where
-  icod_ (PrivateAccess UserWritten) = icodeN 0 ()
-  icod_ PrivateAccess{}             = icodeN 1 ()
-  icod_ PublicAccess                = icodeN' PublicAccess
+  icod_ (PrivateAccess UserWritten) = pure 0
+  icod_ PrivateAccess{}             = pure 1
+  icod_ PublicAccess                = pure 2
 
-  value = vcase valu where
-    valu [0] = valuN $ PrivateAccess UserWritten
-    valu [1] = valuN $ PrivateAccess Inserted
-    valu []  = valuN PublicAccess
-    valu _   = malformed
+  value 0 = pure $ PrivateAccess UserWritten
+  value 1 = pure $ PrivateAccess Inserted
+  value 2 = pure $ PublicAccess
+  value _ = malformed
 
 instance EmbPrj NameSpace where
   icod_ (NameSpace a b c) = icodeN' NameSpace a b c
@@ -119,41 +102,9 @@ instance EmbPrj AbstractModule where
 
   value = valueN AbsModule
 
-instance EmbPrj KindOfName where
-  -- -- Enums have a generic EmbPrj
-  --
-  -- icod_ DefName        = icodeN' DefName
-  -- icod_ ConName        = icodeN 1 ConName
-  -- icod_ FldName        = icodeN 2 FldName
-  -- icod_ PatternSynName = icodeN 3 PatternSynName
-  -- icod_ QuotableName   = icodeN 4 QuotableName
-  -- icod_ MacroName      = icodeN 5 MacroName
-  -- icod_ GeneralizeName = icodeN 6 GeneralizeName
-  -- icod_ DisallowedGeneralizeName = icodeN 7 DisallowedGeneralizeName
+instance EmbPrj KindOfName
 
-  -- value = vcase valu where
-  --   valu []  = valuN DefName
-  --   valu [1] = valuN ConName
-  --   valu [2] = valuN FldName
-  --   valu [3] = valuN PatternSynName
-  --   valu [4] = valuN QuotableName
-  --   valu [5] = valuN MacroName
-  --   valu [6] = valuN GeneralizeName
-  --   valu [7] = valuN DisallowedGeneralizeName
-  --   valu _   = malformed
-
-instance EmbPrj BindingSource where
-  icod_ LambdaBound   = icodeN' LambdaBound
-  icod_ PatternBound  = icodeN 1 PatternBound
-  icod_ LetBound      = icodeN 2 LetBound
-  icod_ WithBound     = icodeN 3 WithBound
-
-  value = vcase valu where
-    valu []  = valuN LambdaBound
-    valu [1] = valuN PatternBound
-    valu [2] = valuN LetBound
-    valu [3] = valuN WithBound
-    valu _   = malformed
+instance EmbPrj BindingSource
 
 instance EmbPrj LocalVar where
   icod_ (LocalVar a b c)  = icodeN' LocalVar a b c

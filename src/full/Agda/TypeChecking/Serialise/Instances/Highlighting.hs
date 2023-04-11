@@ -73,40 +73,7 @@ instance EmbPrj HP.Aspect where
     valu [9]        = valuN HP.Hole
     valu _          = malformed
 
-instance EmbPrj HP.OtherAspect where
-  icod_ HP.Error                = icodeN 0 ()
-  icod_ HP.ErrorWarning         = icodeN 1 ()
-  icod_ HP.DottedPattern        = icodeN' HP.DottedPattern
-  icod_ HP.UnsolvedMeta         = icodeN 2 ()
-  icod_ HP.TerminationProblem   = icodeN 3 ()
-  icod_ HP.IncompletePattern    = icodeN 4 ()
-  icod_ HP.TypeChecks           = icodeN 5 ()
-  icod_ HP.UnsolvedConstraint   = icodeN 6 ()
-  icod_ HP.PositivityProblem    = icodeN 7 ()
-  icod_ HP.Deadcode             = icodeN 8 ()
-  icod_ HP.CoverageProblem      = icodeN 9 ()
-  icod_ HP.CatchallClause       = icodeN 10 ()
-  icod_ HP.ConfluenceProblem    = icodeN 11 ()
-  icod_ HP.MissingDefinition    = icodeN 12 ()
-  icod_ HP.ShadowingInTelescope = icodeN 13 ()
-
-  value = vcase valu where
-    valu [0] = valuN HP.Error
-    valu [1] = valuN HP.ErrorWarning
-    valu []  = valuN HP.DottedPattern
-    valu [2] = valuN HP.UnsolvedMeta
-    valu [3] = valuN HP.TerminationProblem
-    valu [4] = valuN HP.IncompletePattern
-    valu [5] = valuN HP.TypeChecks
-    valu [6] = valuN HP.UnsolvedConstraint
-    valu [7] = valuN HP.PositivityProblem
-    valu [8] = valuN HP.Deadcode
-    valu [9] = valuN HP.CoverageProblem
-    valu [10] = valuN HP.CatchallClause
-    valu [11] = valuN HP.ConfluenceProblem
-    valu [12] = valuN HP.MissingDefinition
-    valu [13] = valuN HP.ShadowingInTelescope
-    valu _   = malformed
+instance EmbPrj HP.OtherAspect
 
 instance EmbPrj HP.Aspects where
   icod_ (HP.Aspects a b c d e) = icodeN' HP.Aspects a b c d e
@@ -140,10 +107,3 @@ instance EmbPrj a => EmbPrj (RM.RangeMap a) where
     convert _ _ = malformed
 
 instance EmbPrj HP.TokenBased where
-  icod_ HP.TokenBased        = icodeN 0 ()
-  icod_ HP.NotOnlyTokenBased = icodeN' HP.NotOnlyTokenBased
-
-  value = vcase valu where
-    valu [0] = valuN HP.TokenBased
-    valu []  = valuN HP.NotOnlyTokenBased
-    valu _   = malformed
