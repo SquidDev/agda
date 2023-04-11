@@ -17,6 +17,8 @@ import Data.Proxy
 
 import Data.Array.IArray
 import Data.Array.IO
+import Data.Array.Unboxed
+import Data.Array.Base (numElements, unsafeAt)
 import qualified Data.HashMap.Strict as Hm
 import qualified Data.ByteString.Lazy as L
 import Data.Hashable
@@ -27,6 +29,8 @@ import qualified Data.Binary.Get as B
 import qualified Data.Text      as T
 import qualified Data.Text.Lazy as TL
 import Data.Typeable ( cast, Typeable, TypeRep, typeRep )
+
+import Agda.TypeChecking.Serialise.Arrays
 
 import Agda.Syntax.Common (NameId)
 import Agda.Syntax.Internal (Term, QName(..), ModuleName(..), nameId)
@@ -146,7 +150,7 @@ type Memo = IOArray Int32 (Hm.HashMap TypeRep U) -- node index -> (type rep -> v
 
 -- | State of the decoder.
 data St = St
-  { nodeE     :: !(Array Int32 Node)     -- ^ Obtained from interface file.
+  { nodeE     :: !(Array Int32 NodeArray) -- ^ Obtained from interface file.
   , stringE   :: !(Array Int32 String)   -- ^ Obtained from interface file.
   , lTextE    :: !(Array Int32 TL.Text)  -- ^ Obtained from interface file.
   , sTextE    :: !(Array Int32 T.Text)   -- ^ Obtained from interface file.
@@ -175,8 +179,8 @@ type R a = ExceptT TypeError (StateT St IO) a
 -- | Throws an error which is suitable when the data stream is
 -- malformed.
 
-malformed :: R a
-malformed = throwError $ GenericError "Malformed input."
+malformed :: forall a. Typeable a => R a
+malformed = throwError $ GenericError ("Malformed input decoding " ++ show (typeRep (Proxy :: Proxy a)) ++ ".")
 
 class Typeable a => EmbPrj a where
   icode :: a -> S Int32  -- ^ Serialization (wrapper).
@@ -366,7 +370,15 @@ icodeMemo getDict getCounter a icodeP = do
 --   If @ix@ is present in 'nodeMemo', @valu@ is not used, but
 --   the thing is read from 'nodeMemo' instead.
 vcase :: forall a . EmbPrj a => (Node -> R a) -> Int32 -> R a
-vcase valu = \ix -> do
+vcase valu = vcase' (valu . elems . nodeArray)
+
+{-# INLINE vcase' #-}
+-- | @vcase value ix@ decodes thing represented by @ix :: Int32@
+--   via the @valu@ function and stores it in 'nodeMemo'.
+--   If @ix@ is present in 'nodeMemo', @valu@ is not used, but
+--   the thing is read from 'nodeMemo' instead.
+vcase' :: forall a . EmbPrj a => (NodeArray -> R a) -> Int32 -> R a
+vcase' valu = \ix -> do
     memo <- gets nodeMemo
     -- compute run-time representation of type a
     let aTyp = typeRep (Proxy :: Proxy a)
@@ -422,31 +434,34 @@ icodeN' _ =
 -- All of these should get inlined at compile time.
 
 class VALU t b where
+  valuN'
+    :: b ~ IsBase t
+    => All EmbPrj (Domains t)
+    => t -> Products (Constant Int32 (Domains t)) -> R (CoDomain t)
 
-  valuN' :: b ~ IsBase t =>
-            All EmbPrj (Domains t) =>
-            t -> Products (Constant Int32 (Domains t)) -> R (CoDomain t)
+  valueArgsCount :: b ~ IsBase t => Proxy t -> Int
 
-  valueArgs :: b ~ IsBase t =>
-               All EmbPrj (CoDomain t ': Domains t) =>
-               Proxy t -> Node -> Maybe (Products (Constant Int32 (Domains t)))
+  valueArgs
+    :: b ~ IsBase t
+    => All EmbPrj (CoDomain t ': Domains t)
+    => Proxy t
+    -> Int -> UArray Int Int32
+    -> Products (Constant Int32 (Domains t))
 
 instance VALU t 'True where
-
   valuN' c () = return c
 
-  valueArgs _ xs = case xs of
-    [] -> Just ()
-    _  -> Nothing
+  valueArgsCount _ = 0
+
+  valueArgs _ i xs = ()
 
 
 instance VALU t (IsBase t) => VALU (a -> t) 'False where
-
   valuN' c (a, as) = value a >>= \ v -> valuN' (c v) as
 
-  valueArgs _ xs = case xs of
-    (x : xs') -> (x,) <$> valueArgs (Proxy :: Proxy t) xs'
-    _         -> Nothing
+  valueArgsCount _ = 1 + valueArgsCount (Proxy :: Proxy t)
+
+  valueArgs _ i xs = (unsafeAt xs i, valueArgs (Proxy :: Proxy t) (i + 1) xs)
 
 {-# INLINE valuN #-}
 valuN :: forall t. VALU t (IsBase t) =>
@@ -461,7 +476,9 @@ valuN f = currys (Proxy :: Proxy (Constant Int32 (Domains t)))
 valueN :: forall t. VALU t (IsBase t) =>
           All EmbPrj (CoDomain t ': Domains t) =>
           t -> Int32 -> R (CoDomain t)
-valueN t = vcase valu where
-  valu int32s = case valueArgs (Proxy :: Proxy t) int32s of
-                  Nothing -> malformed
-                  Just vs -> valuN' t vs
+valueN t idx = vcase' valu idx where
+  valu node =
+    let int32s = nodeArray node in
+    if numElements int32s == valueArgsCount (Proxy :: Proxy t)
+    then valuN' t (valueArgs (Proxy :: Proxy t) 0 int32s)
+    else malformed
