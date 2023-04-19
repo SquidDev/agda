@@ -126,12 +126,10 @@ getBuiltin x =
   fromMaybeM (typeError $ NoBindingForBuiltin x) $ getBuiltin' x
 
 getBuiltin' :: HasBuiltins m => String -> m (Maybe Term)
-getBuiltin' x = do
-    builtin <- getBuiltinThing x
-    case builtin of
-        Just BuiltinRewriteRelations{} -> __IMPOSSIBLE__
-        Just (Builtin t) -> return $ Just $ killRange t
-        _                -> return Nothing
+getBuiltin' x = (getBuiltin =<<) <$> getBuiltinThing x where
+  getBuiltin BuiltinRewriteRelations{} = __IMPOSSIBLE__
+  getBuiltin (Builtin t)               = Just $ killRange t
+  getBuiltin _                         = Nothing
 
 getPrimitive' :: HasBuiltins m => String -> m (Maybe PrimFun)
 getPrimitive' x = (getPrim =<<) <$> getBuiltinThing x
