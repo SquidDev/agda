@@ -15,7 +15,6 @@ import Agda.Syntax.Internal.Generic
 
 import Agda.TypeChecking.Monad
 import Agda.TypeChecking.CheckInternal
-import Agda.TypeChecking.Irrelevance
 import Agda.TypeChecking.ProjectionLike
 import Agda.TypeChecking.Substitute
 import Agda.TypeChecking.Reduce
@@ -23,6 +22,7 @@ import Agda.TypeChecking.Telescope
 import Agda.TypeChecking.Pretty
 import Agda.TypeChecking.Records
 import Agda.TypeChecking.Datatypes
+import Agda.TypeChecking.WorkOnTypes
 
 import Agda.Utils.Size
 import Agda.Utils.Either

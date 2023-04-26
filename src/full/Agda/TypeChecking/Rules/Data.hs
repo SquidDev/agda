@@ -46,6 +46,7 @@ import Agda.TypeChecking.Free
 import Agda.TypeChecking.Forcing
 import Agda.TypeChecking.Irrelevance
 import Agda.TypeChecking.Telescope
+import Agda.TypeChecking.WorkOnTypes
 
 import {-# SOURCE #-} Agda.TypeChecking.Rules.Term ( isType_ )
 

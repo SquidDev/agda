@@ -48,6 +48,7 @@ import Agda.TypeChecking.Telescope
 import Agda.TypeChecking.Telescope.Path
 import Agda.TypeChecking.MetaVars
 import Agda.TypeChecking.Warnings
+import Agda.TypeChecking.WorkOnTypes
 
 import Agda.Interaction.Options
 

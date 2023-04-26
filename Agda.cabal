@@ -710,6 +710,7 @@ library
       Agda.TypeChecking.Telescope.Path
       Agda.TypeChecking.Unquote
       Agda.TypeChecking.Warnings
+      Agda.TypeChecking.WorkOnTypes
       Agda.TypeChecking.With
       Agda.Utils.AffineHole
       Agda.Utils.Applicative

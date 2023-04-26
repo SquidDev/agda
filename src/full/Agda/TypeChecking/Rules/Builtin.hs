@@ -30,10 +30,9 @@ import Agda.TypeChecking.Monad
 
 import qualified Agda.TypeChecking.CompiledClause as CC
 import Agda.TypeChecking.Conversion
-import Agda.TypeChecking.Constraints
+import Agda.TypeChecking.Constraints ( noConstraints )
 import Agda.TypeChecking.EtaContract
 import Agda.TypeChecking.Functions
-import Agda.TypeChecking.Irrelevance
 import Agda.TypeChecking.Names
 import Agda.TypeChecking.Pretty
 import Agda.TypeChecking.Primitive
@@ -43,6 +42,7 @@ import Agda.TypeChecking.Substitute
 import Agda.TypeChecking.Telescope
 import Agda.TypeChecking.Rules.Term ( checkExpr , inferExpr )
 import Agda.TypeChecking.Warnings
+import Agda.TypeChecking.WorkOnTypes
 
 import {-# SOURCE #-} Agda.TypeChecking.Rules.Builtin.Coinduction
 import {-# SOURCE #-} Agda.TypeChecking.Rewriting

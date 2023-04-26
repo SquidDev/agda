@@ -21,6 +21,7 @@ import Agda.TypeChecking.Reduce
 import Agda.TypeChecking.Substitute
 import Agda.TypeChecking.Pretty
 import Agda.TypeChecking.Telescope
+import Agda.TypeChecking.WorkOnTypes
 
 import Agda.Utils.Functor
 import Agda.Utils.List1 (List1, pattern (:|))

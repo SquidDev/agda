@@ -63,7 +63,7 @@ import Agda.TypeChecking.Conversion
 import Agda.TypeChecking.Conversion.Pure
 import Agda.TypeChecking.Datatypes
 import Agda.TypeChecking.Free
-import Agda.TypeChecking.Irrelevance ( workOnTypes , isIrrelevantOrPropM )
+import Agda.TypeChecking.Irrelevance ( isIrrelevantOrPropM )
 import Agda.TypeChecking.Level
 import Agda.TypeChecking.MetaVars
 import Agda.TypeChecking.Monad
@@ -79,6 +79,7 @@ import Agda.TypeChecking.Sort
 import Agda.TypeChecking.Substitute
 import Agda.TypeChecking.Telescope
 import Agda.TypeChecking.Warnings
+import Agda.TypeChecking.WorkOnTypes ( workOnTypes )
 
 import Agda.Utils.Applicative
 import Agda.Utils.Functor

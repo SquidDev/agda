@@ -47,6 +47,7 @@ import Agda.TypeChecking.Irrelevance
 import Agda.TypeChecking.Primitive
 import Agda.TypeChecking.ProjectionLike
 import Agda.TypeChecking.Warnings (MonadWarning)
+import Agda.TypeChecking.WorkOnTypes
 import Agda.Interaction.Options
 
 import Agda.Utils.Functor
