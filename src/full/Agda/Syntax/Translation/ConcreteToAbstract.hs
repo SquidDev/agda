@@ -182,7 +182,7 @@ recordConstructorType decls =
       -- The constructor target type is computed in the type checker.
       -- For now, we put a dummy expression there.
       -- Andreas, 2022-10-06, issue #6165:
-      -- The dummy was builtinSet, but this might not be defined yet.
+      -- The dummy was BuiltinSet, but this might not be defined yet.
       let dummy = A.Lit empty $ LitString "TYPE"
       tel   <- catMaybes <$> mapM makeBinding ds
       return $ A.mkPi (ExprRange (getRange ds)) tel dummy
@@ -868,13 +868,13 @@ instance ToAbstract C.Expr where
         case l of
           LitNat n -> do
             let builtin | n < 0     = Just <$> primFromNeg    -- negative literals are only allowed if FROMNEG is defined
-                        | otherwise = ensureInScope =<< getBuiltin' builtinFromNat
+                        | otherwise = ensureInScope =<< getBuiltin' BuiltinFromNat
             builtin >>= \case
               Just (I.Def q _) -> return $ mkApp q $ A.Lit i $ LitNat $ abs n
               _                -> return alit
 
           LitString s -> do
-            getBuiltin' builtinFromString >>= ensureInScope >>= \case
+            getBuiltin' BuiltinFromString >>= ensureInScope >>= \case
               Just (I.Def q _) -> return $ mkApp q alit
               _                -> return alit
 

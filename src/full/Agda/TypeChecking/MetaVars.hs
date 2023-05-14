@@ -712,7 +712,7 @@ etaExpandMetaTCM kinds m = whenM ((not <$> isFrozen m) `and2M` asksTC envAssignM
                 else dontExpand
             ) $ {- else -} ifM (andM [ return $ Levels `elem` kinds
                             , typeInType
-                            , (Just lvl ==) <$> getBuiltin' builtinLevel
+                            , (Just lvl ==) <$> getBuiltin' BuiltinLevel
                             ]) (do
               reportSLn "tc.meta.eta" 20 $ "Expanding level meta to 0 (type-in-type)"
               -- Andreas, 2012-03-30: No need for occurrence check etc.

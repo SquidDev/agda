@@ -145,7 +145,7 @@ import Agda.Syntax.Literal
 
 import Agda.TypeChecking.Monad
 import qualified Agda.TypeChecking.Monad.Benchmark as Bench
-import Agda.TypeChecking.Monad.Builtin -- (constructorForm, getTerm, builtinPathP)
+import Agda.TypeChecking.Monad.Builtin -- (constructorForm, getTerm, BuiltinPathP)
 import Agda.TypeChecking.Primitive hiding (Nat)
 import Agda.TypeChecking.Primitive.Cubical
 import Agda.TypeChecking.Names

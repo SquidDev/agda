@@ -1209,9 +1209,9 @@ checkLHS mf = updateModality checkLHS_ where
          phi <- case ts of
                    [] -> do
                      a <- reduce (unEl $ unDom dom)
-                     -- builtinIsOne is defined, since this is a precondition for having Partial
+                     -- BuiltinIsOne is defined, since this is a precondition for having Partial
                      isone <- fromMaybe __IMPOSSIBLE__ <$>  -- newline because of CPP
-                       getBuiltinName' builtinIsOne
+                       getBuiltinName' BuiltinIsOne
                      case a of
                        Def q [Apply phi] | q == isone -> return (unArg phi)
                        _           -> typeError . GenericDocError =<< do

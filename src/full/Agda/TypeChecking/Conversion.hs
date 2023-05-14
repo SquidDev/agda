@@ -216,7 +216,7 @@ compareAs cmp a u v = do
           -- Amy, 2023-01-04, issue #6415: and not
           -- prim^unglue/prim^unglueU either! removing the unglue from a
           -- transport/hcomp may cause an infinite loop.
-          cubicalProjs <- traverse getName' [builtin_unglue, builtin_unglueU]
+          cubicalProjs <- traverse getName' [Prim_unglue, Prim_unglueU]
           let
             notFirstOrder = isJust (isRelevantProjection_ def)
                          || any (Just f ==) cubicalProjs
@@ -290,7 +290,7 @@ compareTerm' cmp a m n =
     propIrr  <- isPropEnabled
     isSize   <- isJust <$> isSizeType a'
     (bs, s)  <- reduceWithBlocker $ getSort a'
-    mlvl     <- getBuiltin' builtinLevel
+    mlvl     <- getBuiltin' BuiltinLevel
     reportSDoc "tc.conv.term" 40 $ fsep
       [ "compareTerm", prettyTCM m, prettyTCM cmp, prettyTCM n, ":", prettyTCM a'
       , "at sort", prettyTCM s]
@@ -368,7 +368,7 @@ compareTerm' cmp a m n =
     -- equality at function type (accounts for eta)
     equalFun :: (MonadConversion m) => Sort -> Term -> Term -> Term -> m ()
     equalFun s a@(Pi dom b) m n | domIsFinite dom = do
-       mp <- fmap getPrimName <$> getBuiltin' builtinIsOne
+       mp <- fmap getPrimName <$> getBuiltin' BuiltinIsOne
        let asFn = El s (Pi (dom { domIsFinite = False }) b)
        case unEl $ unDom dom of
           Def q [Apply phi]
@@ -394,13 +394,13 @@ compareTerm' cmp a m n =
     equalPath OType{} a' m n = cmpDef a' m n
 
     cmpDef a'@(El s ty) m n = do
-       mI     <- getBuiltinName'   builtinInterval
-       mIsOne <- getBuiltinName'   builtinIsOne
-       mGlue  <- getPrimitiveName' builtinGlue
-       mHComp <- getPrimitiveName' builtinHComp
-       mSub   <- getBuiltinName' builtinSub
-       mUnglueU <- getPrimitiveTerm' builtin_unglueU
-       mSubIn   <- getBuiltin' builtinSubIn
+       mI     <- getBuiltinName'   BuiltinInterval
+       mIsOne <- getBuiltinName'   BuiltinIsOne
+       mGlue  <- getPrimitiveName' PrimGlue
+       mHComp <- getPrimitiveName' PrimHComp
+       mSub   <- getBuiltinName' BuiltinSub
+       mUnglueU <- getPrimitiveTerm' Prim_unglueU
+       mSubIn   <- getBuiltin' BuiltinSubIn
        case ty of
          Def q es | Just q == mIsOne -> return ()
          Def q es | Just q == mGlue, Just args@(l:_:a:phi:_) <- allApplyElims es -> do
@@ -607,9 +607,9 @@ compareAtom cmp t m n =
         -- returns True in case we handled the comparison already.
         compareEtaPrims :: MonadConversion m => QName -> Elims -> Elims -> m Bool
         compareEtaPrims q es es' = do
-          munglue <- getPrimitiveName' builtin_unglue
-          munglueU <- getPrimitiveName' builtin_unglueU
-          msubout <- getPrimitiveName' builtinSubOut
+          munglue <- getPrimitiveName' Prim_unglue
+          munglueU <- getPrimitiveName' Prim_unglueU
+          msubout <- getPrimitiveName' PrimSubOut
           case () of
             _ | Just q == munglue -> compareUnglueApp q es es'
             _ | Just q == munglueU -> compareUnglueUApp q es es'
@@ -636,7 +636,7 @@ compareAtom cmp t m n =
           let (as,bs) = splitAt 7 es; (as',bs') = splitAt 7 es'
           case (allApplyElims as, allApplyElims as') of
             (Just [la,lb,bA,phi,bT,e,b], Just [la',lb',bA',phi',bT',e',b']) -> do
-              tGlue <- getPrimitiveTerm builtinGlue
+              tGlue <- getPrimitiveTerm PrimGlue
               -- Andrea, 28-07-16:
               -- comparing the types is most probably wasteful,
               -- since b and b' should be neutral terms, but it's a
@@ -2100,7 +2100,7 @@ leqConj (rs, rst) (qs, qst) = do
   if IntMap.isSubmapOfBy BoolSet.isSubsetOf qs rs
     then do
       interval <-
-        El IntervalUniv . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinInterval
+        El IntervalUniv . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinInterval
       -- we don't want to generate new constraints here because
       -- 1. in some situations the same constraint would get generated twice.
       -- 2. unless things are completely accepted we are going to

@@ -64,11 +64,11 @@ data FunctionKit = FunctionKit
 
 simplifyTTerm :: TTerm -> TCM TTerm
 simplifyTTerm t = do
-  kit <- FunctionKit <$> getBuiltinName builtinNatModSucAux
-                     <*> getBuiltinName builtinNatDivSucAux
-                     <*> getBuiltinName builtinNatMinus
-                     <*> getBuiltinName builtinTrue
-                     <*> getBuiltinName builtinFalse
+  kit <- FunctionKit <$> getBuiltinName BuiltinNatModSucAux
+                     <*> getBuiltinName BuiltinNatDivSucAux
+                     <*> getBuiltinName BuiltinNatMinus
+                     <*> getBuiltinName BuiltinTrue
+                     <*> getBuiltinName BuiltinFalse
   return $ runS $ simplify kit t
 
 simplify :: FunctionKit -> TTerm -> S TTerm

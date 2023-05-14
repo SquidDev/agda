@@ -917,8 +917,8 @@ isSingletonType' regardIrrelevance t rs = do
         subtype :: m (Maybe Term)
         subtype = runMaybeT $ do
           (level, tA, phi, elt) <- MaybeT $ isCubicalSubtype t
-          subin <- MaybeT $ getBuiltinName' builtinSubIn
-          itIsOne <- MaybeT $ getBuiltinName' builtinIsOne
+          subin <- MaybeT $ getBuiltinName' BuiltinSubIn
+          itIsOne <- MaybeT $ getBuiltinName' BuiltinIsOne
           phiV <- intervalView phi
           case phiV of
             -- If phi = i1, then inS (elt 1=1) is the only inhabitant.

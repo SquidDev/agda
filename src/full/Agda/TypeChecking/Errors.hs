@@ -696,9 +696,9 @@ instance PrettyTCM TypeError where
       pwords "previous binding to" ++ [prettyTCM x]
 
     NoBindingForBuiltin x
-      | x `elem` [builtinZero, builtinSuc] -> fsep $
+      | x `elem` [BuiltinZero, BuiltinSuc] -> fsep $
         pwords "No binding for builtin " ++ [pretty x <> comma] ++
-        pwords ("use {-# BUILTIN " ++ getBuiltinId builtinNat ++ " name #-} to bind builtin natural " ++
+        pwords ("use {-# BUILTIN " ++ getBuiltinId BuiltinNat ++ " name #-} to bind builtin natural " ++
                 "numbers to the type 'name'")
       | otherwise -> fsep $
         pwords "No binding for builtin thing" ++ [pretty x <> comma] ++

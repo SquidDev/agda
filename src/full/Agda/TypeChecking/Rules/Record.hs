@@ -84,9 +84,9 @@ checkRecDef i name uc (RecordDirectives ind eta0 pat con) (A.DataDefParams gpars
 
   -- Andreas, 2022-10-06, issue #6165:
   -- The target type of the constructor is a meaningless dummy expression which does not type-check.
-  -- We replace it by Set/Type (builtinSet) which is still incorrect but type-checks.
+  -- We replace it by Set/Type (BuiltinSet) which is still incorrect but type-checks.
   -- It will be fixed after type-checking.
-  aType <- A.Def . fromMaybe __IMPOSSIBLE__ <$> getBuiltinName' builtinSet
+  aType <- A.Def . fromMaybe __IMPOSSIBLE__ <$> getBuiltinName' BuiltinSet
   let contel = A.unPiView . (\ (A.PiView tels _) -> A.PiView tels aType) . A.piView $ contel0
 
   traceCall (CheckRecDef (getRange name) name ps fields) $ do
@@ -448,21 +448,21 @@ defineCompKitR ::
   -> TCM CompKit
 defineCompKitR name params fsT fns rect = do
   required <- mapM getTerm'
-        [ someBuiltin builtinInterval
-        , someBuiltin builtinIZero
-        , someBuiltin builtinIOne
-        , someBuiltin builtinIMin
-        , someBuiltin builtinIMax
-        , someBuiltin builtinINeg
-        , someBuiltin builtinPOr
-        , someBuiltin builtinItIsOne
+        [ someBuiltin BuiltinInterval
+        , someBuiltin BuiltinIZero
+        , someBuiltin BuiltinIOne
+        , someBuiltin PrimIMin
+        , someBuiltin PrimIMax
+        , someBuiltin PrimINeg
+        , someBuiltin PrimPOr
+        , someBuiltin BuiltinItIsOne
         ]
   reportSDoc "tc.rec.cxt" 30 $ prettyTCM params
   reportSDoc "tc.rec.cxt" 30 $ prettyTCM fsT
   reportSDoc "tc.rec.cxt" 30 $ pretty rect
   if not $ all isJust required then return $ emptyCompKit else do
-    transp <- whenDefined [builtinTrans]              (defineKanOperationR DoTransp name params fsT fns rect)
-    hcomp  <- whenDefined [builtinTrans,builtinHComp] (defineKanOperationR DoHComp name params fsT fns rect)
+    transp <- whenDefined [PrimTrans]              (defineKanOperationR DoTransp name params fsT fns rect)
+    hcomp  <- whenDefined [PrimTrans,PrimHComp] (defineKanOperationR DoHComp name params fsT fns rect)
     return $ CompKit
       { nameOfTransp = transp
       , nameOfHComp  = hcomp
@@ -489,7 +489,7 @@ defineKanOperationR cmd name params fsT fns rect = do
   -- phi = 1 clause
   c' <- do
            io <- primIOne
-           Just io_name <- getBuiltinName' builtinIOne
+           Just io_name <- getBuiltinName' BuiltinIOne
            one <- primItIsOne
            tInterval <- primIntervalType
            let

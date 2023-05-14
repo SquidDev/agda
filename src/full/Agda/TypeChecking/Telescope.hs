@@ -503,7 +503,7 @@ pathViewAsPi'whnf
   => m (Type -> Either ((Dom Type, Abs Type), (Term,Term)) Type)
 pathViewAsPi'whnf = do
   view <- pathView'
-  minterval  <- getTerm' builtinInterval
+  minterval  <- getTerm' BuiltinInterval
   return $ \case
     (view -> PathType s l p a x y) | Just interval <- minterval ->
       let name | Lam _ (Abs n _) <- unArg a = n

@@ -44,14 +44,14 @@ data BuiltinKit = BuiltinKit
 
 builtinKit :: TCM BuiltinKit
 builtinKit =
-  BuiltinKit <$> isB con builtinZero
-             <*> isB con builtinSuc
-             <*> isB con builtinIntegerPos
-             <*> isB con builtinIntegerNegSuc
-             <*> isB def builtinNatPlus
-             <*> isB def builtinNatTimes
-             <*> isB def builtinNatLess
-             <*> isB def builtinNatEquals
+  BuiltinKit <$> isB con BuiltinZero
+             <*> isB con BuiltinSuc
+             <*> isB con BuiltinIntegerPos
+             <*> isB con BuiltinIntegerNegSuc
+             <*> isB def BuiltinNatPlus
+             <*> isB def BuiltinNatTimes
+             <*> isB def BuiltinNatLess
+             <*> isB def BuiltinNatEquals
              <*> isP pf  PrimForce
              <*> isP pf  PrimWord64FromNat
              <*> isP pf  PrimWord64ToNat
@@ -88,7 +88,7 @@ transform BuiltinKit{..} = tr
              | isEqual f  -> TPrim PEqI
              | isWord64ToNat f   -> TPrim P64ToI
              | isWord64FromNat f -> TPrim PITo64
-        -- Note: Don't do this for builtinNatMinus! PSub is integer minus and
+        -- Note: Don't do this for BuiltinNatMinus! PSub is integer minus and
         --       builtin minus is monus. The simplifier will do it if it can see
         --       that it won't underflow.
 

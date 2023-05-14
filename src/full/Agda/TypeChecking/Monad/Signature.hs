@@ -781,8 +781,8 @@ sameDef d1 d2 = do
 whatInduction :: MonadTCM tcm => QName -> tcm Induction
 whatInduction c = liftTCM $ do
   def <- theDef <$> getConstInfo c
-  mz <- getBuiltinName' builtinIZero
-  mo <- getBuiltinName' builtinIOne
+  mz <- getBuiltinName' BuiltinIZero
+  mo <- getBuiltinName' BuiltinIOne
   case def of
     Datatype{}                    -> return Inductive
     Record{} | not (recRecursive def) -> return Inductive

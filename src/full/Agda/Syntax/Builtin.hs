@@ -471,304 +471,33 @@ isBuiltinNoDef = hasElem builtinsNoDef
 builtinsNoDef :: [BuiltinId]
 builtinsNoDef =
   sizeBuiltins ++
-   -- builtinConId,
-  [ builtinIntervalUniv
-  , builtinId
-  , builtinReflId
-  , builtinInterval
-  , builtinPartial
-  , builtinPartialP
-  , builtinIsOne
-  , builtinSub
-  , builtinIZero
-  , builtinIOne
-  , builtinSet
-  , builtinProp
-  , builtinLevelUniv
-  , builtinSetOmega
-  , builtinStrictSet
-  , builtinSSetOmega
+  [ BuiltinIntervalUniv
+  , BuiltinId
+  , BuiltinReflId
+  , BuiltinInterval
+  , BuiltinPartial
+  , BuiltinPartialP
+  , BuiltinIsOne
+  , BuiltinSub
+  , BuiltinIZero
+  , BuiltinIOne
+  , BuiltinSet
+  , BuiltinProp
+  , BuiltinLevelUniv
+  , BuiltinSetOmega
+  , BuiltinStrictSet
+  , BuiltinSSetOmega
   ]
 
 sizeBuiltins :: [BuiltinId]
 sizeBuiltins =
-  [ builtinSizeUniv
-  , builtinSize
-  , builtinSizeLt
-  , builtinSizeSuc
-  , builtinSizeInf
-  , builtinSizeMax
+  [ BuiltinSizeUniv
+  , BuiltinSize
+  , BuiltinSizeLt
+  , BuiltinSizeSuc
+  , BuiltinSizeInf
+  , BuiltinSizeMax
   ]
-
-builtinNat, builtinSuc, builtinZero, builtinNatPlus, builtinNatMinus,
-  builtinNatTimes, builtinNatDivSucAux, builtinNatModSucAux, builtinNatEquals,
-  builtinNatLess, builtinInteger, builtinIntegerPos, builtinIntegerNegSuc,
-  builtinWord64,
-  builtinFloat, builtinChar, builtinString, builtinUnit, builtinUnitUnit,
-  builtinSigma,
-  builtinBool, builtinTrue, builtinFalse,
-  builtinList, builtinNil, builtinCons, builtinIO,
-  builtinMaybe, builtinNothing, builtinJust,
-  builtinPath, builtinPathP, builtinInterval, builtinIZero, builtinIOne, builtinPartial, builtinPartialP,
-  builtinIsOne,  builtinItIsOne, builtinIsOne1, builtinIsOne2, builtinIsOneEmpty,
-  builtinSub, builtinSubIn,
-  builtinEquiv, builtinEquivFun, builtinEquivProof,
-  builtinTranspProof,
-  builtinId, builtinReflId,
-  builtinSizeUniv, builtinSize, builtinSizeLt,
-  builtinSizeSuc, builtinSizeInf, builtinSizeMax,
-  builtinInf, builtinSharp, builtinFlat,
-  builtinEquality, builtinRefl, builtinRewrite, builtinLevelMax,
-  builtinLevel, builtinLevelZero, builtinLevelSuc,
-  builtinSet, builtinProp, builtinSetOmega, builtinStrictSet, builtinSSetOmega,
-  builtinLevelUniv,
-  builtinIntervalUniv,
-  builtinFromNat, builtinFromNeg, builtinFromString,
-  builtinQName, builtinAgdaSort, builtinAgdaSortSet, builtinAgdaSortLit,
-  builtinAgdaSortProp, builtinAgdaSortPropLit, builtinAgdaSortInf,
-  builtinAgdaSortUnsupported,
-  builtinHiding, builtinHidden, builtinInstance, builtinVisible,
-  builtinRelevance, builtinRelevant, builtinIrrelevant,
-  builtinQuantity, builtinQuantity0, builtinQuantityω,
-  builtinModality, builtinModalityConstructor,
-  builtinAssoc, builtinAssocLeft, builtinAssocRight, builtinAssocNon,
-  builtinPrecedence, builtinPrecRelated, builtinPrecUnrelated,
-  builtinFixity, builtinFixityFixity,
-  builtinArgInfo, builtinArgArgInfo,
-  builtinArg, builtinArgArg,
-  builtinAbs, builtinAbsAbs, builtinAgdaTerm,
-  builtinAgdaTermVar, builtinAgdaTermLam, builtinAgdaTermExtLam,
-  builtinAgdaTermDef, builtinAgdaTermCon, builtinAgdaTermPi,
-  builtinAgdaTermSort, builtinAgdaTermLit, builtinAgdaTermUnsupported, builtinAgdaTermMeta,
-  builtinAgdaErrorPart, builtinAgdaErrorPartString, builtinAgdaErrorPartTerm, builtinAgdaErrorPartPatt, builtinAgdaErrorPartName,
-  builtinAgdaLiteral, builtinAgdaLitNat, builtinAgdaLitWord64, builtinAgdaLitFloat,
-  builtinAgdaLitChar, builtinAgdaLitString, builtinAgdaLitQName, builtinAgdaLitMeta,
-  builtinAgdaClause, builtinAgdaClauseClause, builtinAgdaClauseAbsurd, builtinAgdaPattern,
-  builtinAgdaPatVar, builtinAgdaPatCon, builtinAgdaPatDot, builtinAgdaPatLit,
-  builtinAgdaPatProj, builtinAgdaPatAbsurd,
-  builtinAgdaDefinitionFunDef,
-  builtinAgdaDefinitionDataDef, builtinAgdaDefinitionRecordDef,
-  builtinAgdaDefinitionDataConstructor, builtinAgdaDefinitionPostulate,
-  builtinAgdaDefinitionPrimitive, builtinAgdaDefinition,
-  builtinAgdaMeta,
-  builtinAgdaTCM, builtinAgdaTCMReturn, builtinAgdaTCMBind, builtinAgdaTCMUnify,
-  builtinAgdaTCMTypeError, builtinAgdaTCMInferType,
-  builtinAgdaTCMCheckType, builtinAgdaTCMNormalise, builtinAgdaTCMReduce,
-  builtinAgdaTCMCatchError,
-  builtinAgdaTCMGetContext, builtinAgdaTCMExtendContext, builtinAgdaTCMInContext,
-  builtinAgdaTCMFreshName, builtinAgdaTCMDeclareDef, builtinAgdaTCMDeclarePostulate, builtinAgdaTCMDeclareData, builtinAgdaTCMDefineData, builtinAgdaTCMDefineFun,
-  builtinAgdaTCMGetType, builtinAgdaTCMGetDefinition,
-  builtinAgdaTCMQuoteTerm, builtinAgdaTCMUnquoteTerm, builtinAgdaTCMQuoteOmegaTerm,
-  builtinAgdaTCMBlockOnMeta, builtinAgdaTCMCommit, builtinAgdaTCMIsMacro,
-  builtinAgdaTCMFormatErrorParts, builtinAgdaTCMDebugPrint,
-  builtinAgdaTCMWithNormalisation, builtinAgdaTCMWithReconstructed,
-  builtinAgdaTCMWithExpandLast, builtinAgdaTCMWithReduceDefs,
-  builtinAgdaTCMAskNormalisation, builtinAgdaTCMAskReconstructed,
-  builtinAgdaTCMAskExpandLast, builtinAgdaTCMAskReduceDefs,
-  builtinAgdaTCMNoConstraints,
-  builtinAgdaTCMRunSpeculative,
-  builtinAgdaTCMExec,
-  builtinAgdaTCMGetInstances,
-  builtinAgdaTCMPragmaForeign,
-  builtinAgdaTCMPragmaCompile
-  :: BuiltinId
-
-builtinNat                               = BuiltinNat
-builtinSuc                               = BuiltinSuc
-builtinZero                              = BuiltinZero
-builtinNatPlus                           = BuiltinNatPlus
-builtinNatMinus                          = BuiltinNatMinus
-builtinNatTimes                          = BuiltinNatTimes
-builtinNatDivSucAux                      = BuiltinNatDivSucAux
-builtinNatModSucAux                      = BuiltinNatModSucAux
-builtinNatEquals                         = BuiltinNatEquals
-builtinNatLess                           = BuiltinNatLess
-builtinWord64                            = BuiltinWord64
-builtinInteger                           = BuiltinInteger
-builtinIntegerPos                        = BuiltinIntegerPos
-builtinIntegerNegSuc                     = BuiltinIntegerNegSuc
-builtinFloat                             = BuiltinFloat
-builtinChar                              = BuiltinChar
-builtinString                            = BuiltinString
-builtinUnit                              = BuiltinUnit
-builtinUnitUnit                          = BuiltinUnitUnit
-builtinSigma                             = BuiltinSigma
-builtinBool                              = BuiltinBool
-builtinTrue                              = BuiltinTrue
-builtinFalse                             = BuiltinFalse
-builtinList                              = BuiltinList
-builtinNil                               = BuiltinNil
-builtinCons                              = BuiltinCons
-builtinMaybe                             = BuiltinMaybe
-builtinNothing                           = BuiltinNothing
-builtinJust                              = BuiltinJust
-builtinIO                                = BuiltinIO
-builtinId                                = BuiltinId
-builtinReflId                            = BuiltinReflId
-builtinPath                              = BuiltinPath
-builtinPathP                             = BuiltinPathP
-builtinIntervalUniv                      = BuiltinIntervalUniv
-builtinInterval                          = BuiltinInterval
-builtinIZero                             = BuiltinIZero
-builtinIOne                              = BuiltinIOne
-builtinPartial                           = BuiltinPartial
-builtinPartialP                          = BuiltinPartialP
-builtinIsOne                             = BuiltinIsOne
-builtinItIsOne                           = BuiltinItIsOne
-builtinEquiv                             = BuiltinEquiv
-builtinEquivFun                          = BuiltinEquivFun
-builtinEquivProof                        = BuiltinEquivProof
-builtinTranspProof                       = BuiltinTranspProof
-builtinIsOne1                            = BuiltinIsOne1
-builtinIsOne2                            = BuiltinIsOne2
-builtinIsOneEmpty                        = BuiltinIsOneEmpty
-builtinSub                               = BuiltinSub
-builtinSubIn                             = BuiltinSubIn
-builtinSizeUniv                          = BuiltinSizeUniv
-builtinSize                              = BuiltinSize
-builtinSizeLt                            = BuiltinSizeLt
-builtinSizeSuc                           = BuiltinSizeSuc
-builtinSizeInf                           = BuiltinSizeInf
-builtinSizeMax                           = BuiltinSizeMax
-builtinInf                               = BuiltinInf
-builtinSharp                             = BuiltinSharp
-builtinFlat                              = BuiltinFlat
-builtinEquality                          = BuiltinEquality
-builtinRefl                              = BuiltinRefl
-builtinRewrite                           = BuiltinRewrite
-builtinLevelMax                          = BuiltinLevelMax
-builtinLevel                             = BuiltinLevel
-builtinLevelZero                         = BuiltinLevelZero
-builtinLevelSuc                          = BuiltinLevelSuc
-builtinSet                               = BuiltinSet
-builtinProp                              = BuiltinProp
-builtinSetOmega                          = BuiltinSetOmega
-builtinLevelUniv                         = BuiltinLevelUniv
-builtinSSetOmega                         = BuiltinSSetOmega
-builtinStrictSet                         = BuiltinStrictSet
-builtinFromNat                           = BuiltinFromNat
-builtinFromNeg                           = BuiltinFromNeg
-builtinFromString                        = BuiltinFromString
-builtinQName                             = BuiltinQName
-builtinAgdaSort                          = BuiltinAgdaSort
-builtinAgdaSortSet                       = BuiltinAgdaSortSet
-builtinAgdaSortLit                       = BuiltinAgdaSortLit
-builtinAgdaSortProp                      = BuiltinAgdaSortProp
-builtinAgdaSortPropLit                   = BuiltinAgdaSortPropLit
-builtinAgdaSortInf                       = BuiltinAgdaSortInf
-builtinAgdaSortUnsupported               = BuiltinAgdaSortUnsupported
-builtinHiding                            = BuiltinHiding
-builtinHidden                            = BuiltinHidden
-builtinInstance                          = BuiltinInstance
-builtinVisible                           = BuiltinVisible
-builtinRelevance                         = BuiltinRelevance
-builtinRelevant                          = BuiltinRelevant
-builtinIrrelevant                        = BuiltinIrrelevant
-builtinQuantity                          = BuiltinQuantity
-builtinQuantity0                         = BuiltinQuantity0
-builtinQuantityω                         = BuiltinQuantityω
-builtinModality                          = BuiltinModality
-builtinModalityConstructor               = BuiltinModalityConstructor
-builtinAssoc                             = BuiltinAssoc
-builtinAssocLeft                         = BuiltinAssocLeft
-builtinAssocRight                        = BuiltinAssocRight
-builtinAssocNon                          = BuiltinAssocNon
-builtinPrecedence                        = BuiltinPrecedence
-builtinPrecRelated                       = BuiltinPrecRelated
-builtinPrecUnrelated                     = BuiltinPrecUnrelated
-builtinFixity                            = BuiltinFixity
-builtinFixityFixity                      = BuiltinFixityFixity
-builtinArg                               = BuiltinArg
-builtinArgInfo                           = BuiltinArgInfo
-builtinArgArgInfo                        = BuiltinArgArgInfo
-builtinArgArg                            = BuiltinArgArg
-builtinAbs                               = BuiltinAbs
-builtinAbsAbs                            = BuiltinAbsAbs
-builtinAgdaTerm                          = BuiltinAgdaTerm
-builtinAgdaTermVar                       = BuiltinAgdaTermVar
-builtinAgdaTermLam                       = BuiltinAgdaTermLam
-builtinAgdaTermExtLam                    = BuiltinAgdaTermExtLam
-builtinAgdaTermDef                       = BuiltinAgdaTermDef
-builtinAgdaTermCon                       = BuiltinAgdaTermCon
-builtinAgdaTermPi                        = BuiltinAgdaTermPi
-builtinAgdaTermSort                      = BuiltinAgdaTermSort
-builtinAgdaTermLit                       = BuiltinAgdaTermLit
-builtinAgdaTermUnsupported               = BuiltinAgdaTermUnsupported
-builtinAgdaTermMeta                      = BuiltinAgdaTermMeta
-builtinAgdaErrorPart                     = BuiltinAgdaErrorPart
-builtinAgdaErrorPartString               = BuiltinAgdaErrorPartString
-builtinAgdaErrorPartTerm                 = BuiltinAgdaErrorPartTerm
-builtinAgdaErrorPartPatt                 = BuiltinAgdaErrorPartPatt
-builtinAgdaErrorPartName                 = BuiltinAgdaErrorPartName
-builtinAgdaLiteral                       = BuiltinAgdaLiteral
-builtinAgdaLitNat                        = BuiltinAgdaLitNat
-builtinAgdaLitWord64                     = BuiltinAgdaLitWord64
-builtinAgdaLitFloat                      = BuiltinAgdaLitFloat
-builtinAgdaLitChar                       = BuiltinAgdaLitChar
-builtinAgdaLitString                     = BuiltinAgdaLitString
-builtinAgdaLitQName                      = BuiltinAgdaLitQName
-builtinAgdaLitMeta                       = BuiltinAgdaLitMeta
-builtinAgdaClause                        = BuiltinAgdaClause
-builtinAgdaClauseClause                  = BuiltinAgdaClauseClause
-builtinAgdaClauseAbsurd                  = BuiltinAgdaClauseAbsurd
-builtinAgdaPattern                       = BuiltinAgdaPattern
-builtinAgdaPatVar                        = BuiltinAgdaPatVar
-builtinAgdaPatCon                        = BuiltinAgdaPatCon
-builtinAgdaPatDot                        = BuiltinAgdaPatDot
-builtinAgdaPatLit                        = BuiltinAgdaPatLit
-builtinAgdaPatProj                       = BuiltinAgdaPatProj
-builtinAgdaPatAbsurd                     = BuiltinAgdaPatAbsurd
-builtinAgdaDefinitionFunDef              = BuiltinAgdaDefinitionFunDef
-builtinAgdaDefinitionDataDef             = BuiltinAgdaDefinitionDataDef
-builtinAgdaDefinitionRecordDef           = BuiltinAgdaDefinitionRecordDef
-builtinAgdaDefinitionDataConstructor     = BuiltinAgdaDefinitionDataConstructor
-builtinAgdaDefinitionPostulate           = BuiltinAgdaDefinitionPostulate
-builtinAgdaDefinitionPrimitive           = BuiltinAgdaDefinitionPrimitive
-builtinAgdaDefinition                    = BuiltinAgdaDefinition
-builtinAgdaMeta                          = BuiltinAgdaMeta
-builtinAgdaTCM                           = BuiltinAgdaTCM
-builtinAgdaTCMReturn                     = BuiltinAgdaTCMReturn
-builtinAgdaTCMBind                       = BuiltinAgdaTCMBind
-builtinAgdaTCMUnify                      = BuiltinAgdaTCMUnify
-builtinAgdaTCMTypeError                  = BuiltinAgdaTCMTypeError
-builtinAgdaTCMInferType                  = BuiltinAgdaTCMInferType
-builtinAgdaTCMCheckType                  = BuiltinAgdaTCMCheckType
-builtinAgdaTCMNormalise                  = BuiltinAgdaTCMNormalise
-builtinAgdaTCMReduce                     = BuiltinAgdaTCMReduce
-builtinAgdaTCMCatchError                 = BuiltinAgdaTCMCatchError
-builtinAgdaTCMGetContext                 = BuiltinAgdaTCMGetContext
-builtinAgdaTCMExtendContext              = BuiltinAgdaTCMExtendContext
-builtinAgdaTCMInContext                  = BuiltinAgdaTCMInContext
-builtinAgdaTCMFreshName                  = BuiltinAgdaTCMFreshName
-builtinAgdaTCMDeclareDef                 = BuiltinAgdaTCMDeclareDef
-builtinAgdaTCMDeclarePostulate           = BuiltinAgdaTCMDeclarePostulate
-builtinAgdaTCMDeclareData                = BuiltinAgdaTCMDeclareData
-builtinAgdaTCMDefineData                 = BuiltinAgdaTCMDefineData
-builtinAgdaTCMDefineFun                  = BuiltinAgdaTCMDefineFun
-builtinAgdaTCMGetType                    = BuiltinAgdaTCMGetType
-builtinAgdaTCMGetDefinition              = BuiltinAgdaTCMGetDefinition
-builtinAgdaTCMBlockOnMeta                = BuiltinAgdaTCMBlockOnMeta
-builtinAgdaTCMCommit                     = BuiltinAgdaTCMCommit
-builtinAgdaTCMQuoteTerm                  = BuiltinAgdaTCMQuoteTerm
-builtinAgdaTCMUnquoteTerm                = BuiltinAgdaTCMUnquoteTerm
-builtinAgdaTCMQuoteOmegaTerm             = BuiltinAgdaTCMQuoteOmegaTerm
-builtinAgdaTCMIsMacro                    = BuiltinAgdaTCMIsMacro
-builtinAgdaTCMWithNormalisation          = BuiltinAgdaTCMWithNormalisation
-builtinAgdaTCMWithReconstructed          = BuiltinAgdaTCMWithReconstructed
-builtinAgdaTCMWithExpandLast             = BuiltinAgdaTCMWithExpandLast
-builtinAgdaTCMWithReduceDefs             = BuiltinAgdaTCMWithReduceDefs
-builtinAgdaTCMAskNormalisation           = BuiltinAgdaTCMAskNormalisation
-builtinAgdaTCMAskReconstructed           = BuiltinAgdaTCMAskReconstructed
-builtinAgdaTCMAskExpandLast              = BuiltinAgdaTCMAskExpandLast
-builtinAgdaTCMAskReduceDefs              = BuiltinAgdaTCMAskReduceDefs
-builtinAgdaTCMFormatErrorParts           = BuiltinAgdaTCMFormatErrorParts
-builtinAgdaTCMDebugPrint                 = BuiltinAgdaTCMDebugPrint
-builtinAgdaTCMNoConstraints              = BuiltinAgdaTCMNoConstraints
-builtinAgdaTCMRunSpeculative             = BuiltinAgdaTCMRunSpeculative
-builtinAgdaTCMExec                       = BuiltinAgdaTCMExec
-builtinAgdaTCMGetInstances               = BuiltinAgdaTCMGetInstances
-builtinAgdaTCMPragmaForeign              = BuiltinAgdaTCMPragmaForeign
-builtinAgdaTCMPragmaCompile              = BuiltinAgdaTCMPragmaCompile
 
 -- | Lookup a builtin by the string used in the @BUILTIN@ pragma.
 builtinById :: String -> Maybe BuiltinId
@@ -1046,34 +775,6 @@ instance IsBuiltin PrimitiveId where
     PrimMetaToNat                         -> "primMetaToNat"
     PrimMetaToNatInjective                -> "primMetaToNatInjective"
     PrimLockUniv                          -> "primLockUniv"
-
-builtinConId, builtinIdElim, builtinSubOut,
-  builtinIMin, builtinIMax, builtinINeg,
-  builtinGlue, builtin_glue, builtin_unglue, builtin_glueU, builtin_unglueU,
-  builtinFaceForall, builtinComp, builtinPOr,
-  builtinTrans,  builtinDepIMin,
-  builtinIdFace, builtinIdPath, builtinHComp, builtinLockUniv
-  :: PrimitiveId
-builtinConId                             = PrimConId
-builtinIdElim                            = PrimIdElim
-builtinIMin                              = PrimIMin
-builtinIMax                              = PrimIMax
-builtinINeg                              = PrimINeg
-builtinSubOut                            = PrimSubOut
-builtinGlue                              = PrimGlue
-builtin_glue                             = Prim_glue
-builtin_unglue                           = Prim_unglue
-builtin_glueU                            = Prim_glueU
-builtin_unglueU                          = Prim_unglueU
-builtinFaceForall                        = PrimFaceForall
-builtinComp                              = PrimComp
-builtinPOr                               = PrimPOr
-builtinTrans                             = PrimTrans
-builtinDepIMin                           = PrimDepIMin
-builtinIdFace                            = PrimIdFace
-builtinIdPath                            = PrimIdPath
-builtinHComp                             = PrimHComp
-builtinLockUniv                          = PrimLockUniv
 
 -- | Lookup a primitive by its identifier.
 primitiveById :: String -> Maybe PrimitiveId

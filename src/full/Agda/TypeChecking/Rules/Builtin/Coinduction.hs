@@ -52,7 +52,7 @@ typeOfFlat = hPi "a" (el primLevel) $
 -- definition.
 
 bindBuiltinInf :: ResolvedName -> TCM ()
-bindBuiltinInf x = bindPostulatedName builtinInf x $ \inf _ -> do
+bindBuiltinInf x = bindPostulatedName BuiltinInf x $ \inf _ -> do
   _ <- checkExpr (A.Def inf) =<< typeOfInf
   return $ Def inf []
 
@@ -66,7 +66,7 @@ bindBuiltinInf x = bindPostulatedName builtinInf x $ \inf _ -> do
 
 bindBuiltinSharp :: ResolvedName -> TCM ()
 bindBuiltinSharp x =
-  bindPostulatedName builtinSharp x $ \sharp sharpDefn -> do
+  bindPostulatedName BuiltinSharp x $ \sharp sharpDefn -> do
     sharpType <- typeOfSharp
     TelV fieldTel _ <- telView sharpType
     _ <- checkExpr (A.Def sharp) sharpType
@@ -118,7 +118,7 @@ bindBuiltinSharp x =
 
 bindBuiltinFlat :: ResolvedName -> TCM ()
 bindBuiltinFlat x =
-  bindPostulatedName builtinFlat x $ \ flat flatDefn -> do
+  bindPostulatedName BuiltinFlat x $ \ flat flatDefn -> do
     _ <- checkExpr (A.Def flat) =<< typeOfFlat
     Def sharp _ <- primSharp
     kit         <- requireLevels

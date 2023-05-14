@@ -569,12 +569,12 @@ slowReduceTerm v = do
     where
       -- NOTE: reduceNat can traverse the entire term.
       reduceNat v@(Con c ci []) = do
-        mz  <- getBuiltin' builtinZero
+        mz  <- getBuiltin' BuiltinZero
         case v of
           _ | Just v == mz  -> return $ Lit $ LitNat 0
           _                 -> return v
       reduceNat v@(Con c ci [Apply a]) | visible a && isRelevant a = do
-        ms  <- getBuiltin' builtinSuc
+        ms  <- getBuiltin' BuiltinSuc
         case v of
           _ | Just (Con c ci []) == ms -> inc <$> reduce' (unArg a)
           _                         -> return v

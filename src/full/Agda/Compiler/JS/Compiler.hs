@@ -462,10 +462,10 @@ definition' kit q d t ls =
           else Just $ Export ls funBody'
 
     Primitive{primName = p}
-      | p == builtin_glueU ->
+      | p == Prim_glueU ->
         -- The string prim^glueU is not a valid JS name.
         plainJS "agdaRTS.prim_glueU"
-      | p == builtin_unglueU ->
+      | p == Prim_unglueU ->
         -- The string prim^unglueU is not a valid JS name.
         plainJS "agdaRTS.prim_unglueU"
       | p `Set.member` primitives ->
@@ -853,25 +853,25 @@ primitives = Set.fromList
   , PrimShowMeta
   , PrimMetaToNat
   -- , PrimMetaToNatInjective      -- missing
-  , builtinIMin
-  , builtinIMax
-  , builtinINeg
+  , PrimIMin
+  , PrimIMax
+  , PrimINeg
   , PrimPartial
   , PrimPartialP
-  , builtinPOr
-  , builtinComp
-  , builtinTrans
-  , builtinHComp
-  , builtinSubOut
-  , builtin_glueU
-  , builtin_unglueU
-  , builtinFaceForall
+  , PrimPOr
+  , PrimComp
+  , PrimTrans
+  , PrimHComp
+  , PrimSubOut
+  , Prim_glueU
+  , Prim_unglueU
+  , PrimFaceForall
   , PrimDepIMin
   , PrimIdFace
   , PrimIdPath
-  , builtinIdElim
-  , builtinConId
-  -- , builtinGlue                   -- missing
-  -- , builtin_glue                  -- missing
-  -- , builtin_unglue                -- missing
+  , PrimIdElim
+  , PrimConId
+  -- , PrimGlue                   -- missing
+  -- , Prim_glue                  -- missing
+  -- , Prim_unglue                -- missing
   ]

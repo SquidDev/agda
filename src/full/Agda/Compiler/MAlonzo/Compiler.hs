@@ -220,79 +220,79 @@ ghcPreCompile flags = do
                 , optGhcStrict     = flagGhcStrict flags
                 }
 
-  mbool       <- getBuiltinName builtinBool
-  mtrue       <- getBuiltinName builtinTrue
-  mfalse      <- getBuiltinName builtinFalse
-  mlist       <- getBuiltinName builtinList
-  mnil        <- getBuiltinName builtinNil
-  mcons       <- getBuiltinName builtinCons
-  mmaybe      <- getBuiltinName builtinMaybe
-  mnothing    <- getBuiltinName builtinNothing
-  mjust       <- getBuiltinName builtinJust
-  mnat        <- getBuiltinName builtinNat
-  minteger    <- getBuiltinName builtinInteger
-  mword64     <- getBuiltinName builtinWord64
-  minf        <- getBuiltinName builtinInf
-  msharp      <- getBuiltinName builtinSharp
-  mflat       <- getBuiltinName builtinFlat
-  minterval   <- getBuiltinName builtinInterval
-  mizero      <- getBuiltinName builtinIZero
-  mione       <- getBuiltinName builtinIOne
-  misone      <- getBuiltinName builtinIsOne
-  mitisone    <- getBuiltinName builtinItIsOne
-  misone1     <- getBuiltinName builtinIsOne1
-  misone2     <- getBuiltinName builtinIsOne2
-  misoneempty <- getBuiltinName builtinIsOneEmpty
-  mpathp      <- getBuiltinName builtinPathP
-  msub        <- getBuiltinName builtinSub
-  msubin      <- getBuiltinName builtinSubIn
-  mid         <- getBuiltinName builtinId
-  mconid      <- getPrimitiveName' builtinConId
+  mbool       <- getBuiltinName BuiltinBool
+  mtrue       <- getBuiltinName BuiltinTrue
+  mfalse      <- getBuiltinName BuiltinFalse
+  mlist       <- getBuiltinName BuiltinList
+  mnil        <- getBuiltinName BuiltinNil
+  mcons       <- getBuiltinName BuiltinCons
+  mmaybe      <- getBuiltinName BuiltinMaybe
+  mnothing    <- getBuiltinName BuiltinNothing
+  mjust       <- getBuiltinName BuiltinJust
+  mnat        <- getBuiltinName BuiltinNat
+  minteger    <- getBuiltinName BuiltinInteger
+  mword64     <- getBuiltinName BuiltinWord64
+  minf        <- getBuiltinName BuiltinInf
+  msharp      <- getBuiltinName BuiltinSharp
+  mflat       <- getBuiltinName BuiltinFlat
+  minterval   <- getBuiltinName BuiltinInterval
+  mizero      <- getBuiltinName BuiltinIZero
+  mione       <- getBuiltinName BuiltinIOne
+  misone      <- getBuiltinName BuiltinIsOne
+  mitisone    <- getBuiltinName BuiltinItIsOne
+  misone1     <- getBuiltinName BuiltinIsOne1
+  misone2     <- getBuiltinName BuiltinIsOne2
+  misoneempty <- getBuiltinName BuiltinIsOneEmpty
+  mpathp      <- getBuiltinName BuiltinPathP
+  msub        <- getBuiltinName BuiltinSub
+  msubin      <- getBuiltinName BuiltinSubIn
+  mid         <- getBuiltinName BuiltinId
+  mconid      <- getPrimitiveName' PrimConId
 
   istcbuiltin <- do
     builtins <- mapM getBuiltinName
-      [ builtinAgdaTCMReturn
-      , builtinAgdaTCMBind
-      , builtinAgdaTCMUnify
-      , builtinAgdaTCMTypeError
-      , builtinAgdaTCMInferType
-      , builtinAgdaTCMCheckType
-      , builtinAgdaTCMNormalise
-      , builtinAgdaTCMReduce
-      , builtinAgdaTCMCatchError
-      , builtinAgdaTCMQuoteTerm
-      , builtinAgdaTCMUnquoteTerm
-      , builtinAgdaTCMQuoteOmegaTerm
-      , builtinAgdaTCMGetContext
-      , builtinAgdaTCMExtendContext
-      , builtinAgdaTCMInContext
-      , builtinAgdaTCMFreshName
-      , builtinAgdaTCMDeclareDef
-      , builtinAgdaTCMDeclarePostulate
-      , builtinAgdaTCMDeclareData
-      , builtinAgdaTCMDefineData
-      , builtinAgdaTCMDefineFun
-      , builtinAgdaTCMGetType
-      , builtinAgdaTCMGetDefinition
-      , builtinAgdaTCMBlockOnMeta
-      , builtinAgdaTCMCommit
-      , builtinAgdaTCMIsMacro
-      , builtinAgdaTCMWithNormalisation
-      , builtinAgdaTCMWithReconstructed
-      , builtinAgdaTCMWithExpandLast
-      , builtinAgdaTCMWithReduceDefs
-      , builtinAgdaTCMAskNormalisation
-      , builtinAgdaTCMAskReconstructed
-      , builtinAgdaTCMAskExpandLast
-      , builtinAgdaTCMAskReduceDefs
-      , builtinAgdaTCMFormatErrorParts
-      , builtinAgdaTCMDebugPrint
-      , builtinAgdaTCMNoConstraints
-      , builtinAgdaTCMRunSpeculative
-      , builtinAgdaTCMExec
-      , builtinAgdaTCMGetInstances
-      , builtinAgdaTCMPragmaForeign
-      , builtinAgdaTCMPragmaCompile
+      [ BuiltinAgdaTCMReturn
+      , BuiltinAgdaTCMBind
+      , BuiltinAgdaTCMUnify
+      , BuiltinAgdaTCMTypeError
+      , BuiltinAgdaTCMInferType
+      , BuiltinAgdaTCMCheckType
+      , BuiltinAgdaTCMNormalise
+      , BuiltinAgdaTCMReduce
+      , BuiltinAgdaTCMCatchError
+      , BuiltinAgdaTCMQuoteTerm
+      , BuiltinAgdaTCMUnquoteTerm
+      , BuiltinAgdaTCMQuoteOmegaTerm
+      , BuiltinAgdaTCMGetContext
+      , BuiltinAgdaTCMExtendContext
+      , BuiltinAgdaTCMInContext
+      , BuiltinAgdaTCMFreshName
+      , BuiltinAgdaTCMDeclareDef
+      , BuiltinAgdaTCMDeclarePostulate
+      , BuiltinAgdaTCMDeclareData
+      , BuiltinAgdaTCMDefineData
+      , BuiltinAgdaTCMDefineFun
+      , BuiltinAgdaTCMGetType
+      , BuiltinAgdaTCMGetDefinition
+      , BuiltinAgdaTCMBlockOnMeta
+      , BuiltinAgdaTCMCommit
+      , BuiltinAgdaTCMIsMacro
+      , BuiltinAgdaTCMWithNormalisation
+      , BuiltinAgdaTCMWithReconstructed
+      , BuiltinAgdaTCMWithExpandLast
+      , BuiltinAgdaTCMWithReduceDefs
+      , BuiltinAgdaTCMAskNormalisation
+      , BuiltinAgdaTCMAskReconstructed
+      , BuiltinAgdaTCMAskExpandLast
+      , BuiltinAgdaTCMAskReduceDefs
+      , BuiltinAgdaTCMFormatErrorParts
+      , BuiltinAgdaTCMDebugPrint
+      , BuiltinAgdaTCMNoConstraints
+      , BuiltinAgdaTCMRunSpeculative
+      , BuiltinAgdaTCMExec
+      , BuiltinAgdaTCMGetInstances
+      , BuiltinAgdaTCMPragmaForeign
+      , BuiltinAgdaTCMPragmaCompile
       ]
     return $
       flip HashSet.member $
@@ -530,8 +530,8 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
       Datatype{} | is ghcEnvBool -> do
         sequence_ [primTrue, primFalse] -- Just to get the proper error for missing TRUE/FALSE
         let d = dname q
-        Just true  <- getBuiltinName builtinTrue
-        Just false <- getBuiltinName builtinFalse
+        Just true  <- getBuiltinName BuiltinTrue
+        Just false <- getBuiltinName BuiltinFalse
         cs <- mapM (compiledcondecl Nothing) [false, true]
         retDecls $ [ compiledTypeSynonym q "Bool" 0
                    , HS.FunBind [HS.Match d [] (HS.UnGuardedRhs HS.unit_con) emptyBinds] ] ++
@@ -544,8 +544,8 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
           fsep $ pwords "Ignoring GHC pragma for builtin lists; they always compile to Haskell lists."
         let d = dname q
             t = unqhname TypeK q
-        Just nil  <- getBuiltinName builtinNil
-        Just cons <- getBuiltinName builtinCons
+        Just nil  <- getBuiltinName BuiltinNil
+        Just cons <- getBuiltinName BuiltinCons
         let vars f n = map (f . ihname A) [0 .. n - 1]
         cs <- mapM (compiledcondecl Nothing) [nil, cons]
         retDecls $ [ HS.TypeDecl t (vars HS.UnkindedVar (np - 1)) (HS.FakeType "[]")
@@ -559,8 +559,8 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
           fsep $ pwords "Ignoring GHC pragma for builtin maybe; they always compile to Haskell lists."
         let d = dname q
             t = unqhname TypeK q
-        Just nothing <- getBuiltinName builtinNothing
-        Just just    <- getBuiltinName builtinJust
+        Just nothing <- getBuiltinName BuiltinNothing
+        Just just    <- getBuiltinName BuiltinJust
         let vars f n = map (f . ihname A) [0 .. n - 1]
         cs <- mapM (compiledcondecl Nothing) [nothing, just]
         retDecls $ [ HS.TypeDecl t (vars HS.UnkindedVar (np - 1)) (HS.FakeType "Maybe")
@@ -570,7 +570,7 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
       -- Compiling Inf
       _ | is ghcEnvInf -> do
         _ <- primSharp -- To get a proper error for missing SHARP.
-        Just sharp <- getBuiltinName builtinSharp
+        Just sharp <- getBuiltinName BuiltinSharp
         sharpC     <- (compiledcondecl Nothing) sharp
         let d   = dname q
             err = "No term-level implementation of the INFINITY builtin."
@@ -585,8 +585,8 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
       -- compiled as False and 1 as True.
       Axiom{} | is ghcEnvInterval -> do
         sequence_ [primIZero, primIOne]
-        Just i0 <- getBuiltinName builtinIZero
-        Just i1 <- getBuiltinName builtinIOne
+        Just i0 <- getBuiltinName BuiltinIZero
+        Just i1 <- getBuiltinName BuiltinIOne
         cs      <- mapM (compiledcondecl (Just 0)) [i0, i1]
         retDecls $
           [ compiledTypeSynonym q "Bool" 0
@@ -638,7 +638,7 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
       -- to the underlying type.
       Axiom{} | is ghcEnvPathP -> do
         sequence_ [primInterval]
-        Just int <- getBuiltinName builtinInterval
+        Just int <- getBuiltinName BuiltinInterval
         int      <- xhqn TypeK int
         retDecls $
           [ HS.TypeDecl (unqhname TypeK q)
@@ -675,7 +675,7 @@ definition def@Defn{defName = q, defType = ty, theDef = d} = do
       -- Path x y is compiled to.
       Datatype{} | is ghcEnvId -> do
         sequence_ [primInterval]
-        Just int <- getBuiltinName builtinInterval
+        Just int <- getBuiltinName BuiltinInterval
         int      <- xhqn TypeK int
         -- re  #3733: implement reflId
         retDecls $

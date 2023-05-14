@@ -797,7 +797,7 @@ sizeExpr u = do
 unSizeExpr :: HasBuiltins m => DBSizeExpr -> m Term
 unSizeExpr a =
   case a of
-    Infty         -> fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSizeInf
+    Infty         -> fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSizeInf
     Rigid r (O n) -> do
       unless (n >= 0) __IMPOSSIBLE__
       sizeSuc n $ var $ rigidIndex r

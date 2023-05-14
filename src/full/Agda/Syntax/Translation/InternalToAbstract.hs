@@ -419,8 +419,8 @@ instance Reify Term where
 reifyPathPConstAsPath :: MonadReify m => QName -> Elims -> m (QName, Elims)
 reifyPathPConstAsPath x es@[I.Apply l, I.Apply t, I.Apply lhs, I.Apply rhs] = do
    reportSLn "reify.def" 100 $ "reifying def path " ++ show (x,es)
-   mpath  <- getBuiltinName' builtinPath
-   mpathp <- getBuiltinName' builtinPathP
+   mpath  <- getBuiltinName' BuiltinPath
+   mpathp <- getBuiltinName' BuiltinPathP
    let fallback = return (x,es)
    case (,) <$> mpath <*> mpathp of
      Just (path,pathp) | x == pathp -> do
@@ -1438,20 +1438,20 @@ instance Reify Sort where
         I.Inf f 0 -> return $ A.Def' (nameOfSetOmega f) A.NoSuffix
         I.Inf f n -> return $ A.Def' (nameOfSetOmega f) (A.Suffix n)
         I.SSet a  -> do
-          I.Def sset [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinStrictSet
+          I.Def sset [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinStrictSet
           a <- reify a
           return $ A.App defaultAppInfo_ (A.Def sset) (defaultNamedArg a)
         I.SizeUniv  -> do
-          I.Def sizeU [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSizeUniv
+          I.Def sizeU [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSizeUniv
           return $ A.Def sizeU
         I.LockUniv  -> do
-          lockU <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinLockUniv
+          lockU <- fromMaybe __IMPOSSIBLE__ <$> getName' PrimLockUniv
           return $ A.Def lockU
         I.LevelUniv -> do
-          levelU <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinLevelUniv
+          levelU <- fromMaybe __IMPOSSIBLE__ <$> getName' BuiltinLevelUniv
           return $ A.Def levelU
         I.IntervalUniv -> do
-          intervalU <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinIntervalUniv
+          intervalU <- fromMaybe __IMPOSSIBLE__ <$> getName' BuiltinIntervalUniv
           return $ A.Def intervalU
         I.PiSort a s1 s2 -> do
           pis <- freshName_ ("piSort" :: String) -- TODO: hack

@@ -140,12 +140,12 @@ isUnstableDef :: PureTCM m => QName -> m Bool
 isUnstableDef qn = do
   defn <- getConstInfo qn
   prims <- traverse getPrimitiveName'
-    [ builtinHComp
-    , builtinComp
-    , builtinTrans
-    , builtinGlue
-    , builtin_glue
-    , builtin_glueU ]
+    [ PrimHComp
+    , PrimComp
+    , PrimTrans
+    , PrimGlue
+    , Prim_glue
+    , Prim_glueU ]
   case theDef defn of
     _ | any (Just qn ==) prims -> pure True
     Function{funIsKanOp = Just _} -> pure True

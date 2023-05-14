@@ -78,8 +78,8 @@ getBuiltinDefName s = fromDef <$> getBuiltin' s
 
 getBuiltinSize :: (HasBuiltins m) => m (Maybe QName, Maybe QName)
 getBuiltinSize = do
-  size   <- getBuiltinDefName builtinSize
-  sizelt <- getBuiltinDefName builtinSizeLt
+  size   <- getBuiltinDefName BuiltinSize
+  sizelt <- getBuiltinDefName BuiltinSizeLt
   return (size, sizelt)
 
 isSizeNameTest :: (HasOptions m, HasBuiltins m) => m (QName -> Bool)
@@ -104,16 +104,16 @@ haveSizedTypes = do
 
 -- | Test whether the SIZELT builtin is defined.
 haveSizeLt :: TCM Bool
-haveSizeLt = isJust <$> getBuiltinDefName builtinSizeLt
+haveSizeLt = isJust <$> getBuiltinDefName BuiltinSizeLt
 
 -- | Add polarity info to a SIZE builtin.
 builtinSizeHook :: BuiltinId -> QName -> Type -> TCM ()
 builtinSizeHook s q t = do
-  when (s `elem` [builtinSizeLt, builtinSizeSuc]) $ do
+  when (s `elem` [BuiltinSizeLt, BuiltinSizeSuc]) $ do
     modifySignature $ updateDefinition q
       $ updateDefPolarity       (const [Covariant])
       . updateDefArgOccurrences (const [StrictPos])
-  when (s == builtinSizeMax) $ do
+  when (s == BuiltinSizeMax) $ do
     modifySignature $ updateDefinition q
       $ updateDefPolarity       (const [Covariant, Covariant])
       . updateDefArgOccurrences (const [StrictPos, StrictPos])
@@ -142,13 +142,13 @@ sizeType_ size = El sizeSort $ Def size []
 
 -- | The built-in type @SIZE@.
 sizeType :: (HasBuiltins m, MonadTCEnv m, ReadTCState m) => m Type
-sizeType = El sizeSort . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSize
+sizeType = El sizeSort . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSize
 
 -- | The name of @SIZESUC@.
 sizeSucName :: (HasBuiltins m, HasOptions m) => m (Maybe QName)
 sizeSucName = do
   ifM (not <$> sizedTypesOption) (return Nothing) $ do
-    getBuiltin' builtinSizeSuc >>= \case
+    getBuiltin' BuiltinSizeSuc >>= \case
       Just (Def x []) -> return $ Just x
       _               -> return Nothing
 
@@ -156,7 +156,7 @@ sizeSuc :: HasBuiltins m => Nat -> Term -> m Term
 sizeSuc n v | n < 0     = __IMPOSSIBLE__
             | n == 0    = return v
             | otherwise = do
-  Def suc [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSizeSuc
+  Def suc [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSizeSuc
   return $ fromMaybe __IMPOSSIBLE__ (iterate (sizeSuc_ suc) v !!! n)
 
 sizeSuc_ :: QName -> Term -> Term
@@ -183,8 +183,8 @@ data SizeView = SizeInf | SizeSuc Term | OtherSize Term
 sizeView :: (HasBuiltins m, MonadTCEnv m, ReadTCState m)
          => Term -> m SizeView
 sizeView v = do
-  Def inf [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSizeInf
-  Def suc [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSizeSuc
+  Def inf [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSizeInf
+  Def suc [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSizeSuc
   case v of
     Def x []        | x == inf -> return SizeInf
     Def x [Apply u] | x == suc -> return $ SizeSuc (unArg u)

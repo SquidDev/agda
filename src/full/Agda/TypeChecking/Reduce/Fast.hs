@@ -447,11 +447,11 @@ fastReduce' norm v = do
       builtinName   = fmap name . runBuiltinAccess tcState . getBuiltin'
       primitiveName = fmap primFunName . runBuiltinAccess tcState . getPrimitive'
 
-      zero  = builtinName builtinZero
-      suc   = builtinName builtinSuc
-      true  = builtinName builtinTrue
-      false = builtinName builtinFalse
-      refl  = builtinName builtinRefl
+      zero  = builtinName BuiltinZero
+      suc   = builtinName BuiltinSuc
+      true  = builtinName BuiltinTrue
+      false = builtinName BuiltinFalse
+      refl  = builtinName BuiltinRefl
 
       force = primitiveName PrimForce
       erase = primitiveName PrimErase
@@ -908,7 +908,7 @@ reduceTm rEnv bEnv !constInfo normalisation =
               | otherwise  -> runAM (Match f cc spine ([] :> cl) ctrl)
             CAxiom         -> rewriteAM done
             CTyCon         -> rewriteAM done
-            CCon{}         -> runAM done   -- Only happens for builtinSharp (which is a Def when you bind it)
+            CCon{}         -> runAM done   -- Only happens for BuiltinSharp (which is a Def when you bind it)
             CForce | (spine0, Apply v : spine1) <- splitAt 4 spine ->
               evalPointerAM (unArg v) [] (ForceK f spine0 spine1 : ctrl)
             CForce -> runAM done -- partially applied

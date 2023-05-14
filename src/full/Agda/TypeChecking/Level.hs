@@ -48,12 +48,12 @@ levelType =
 -- | Get the 'primLevel' as a 'Type'.  Unsafe, crashes if the BUILTIN LEVEL is undefined.
 levelType' :: (HasBuiltins m) => m Type
 levelType' =
-  El LevelUniv . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevel
+  El LevelUniv . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevel
 
 isLevelType :: PureTCM m => Type -> m Bool
 isLevelType a = reduce (unEl a) >>= \case
   Def f [] -> do
-    Def lvl [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevel
+    Def lvl [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevel
     return $ f == lvl
   _ -> return False
 
@@ -61,10 +61,10 @@ isLevelType a = reduce (unEl a) >>= \case
 {-# SPECIALIZE builtinLevelKit :: ReduceM LevelKit #-}
 builtinLevelKit :: (HasBuiltins m) => m LevelKit
 builtinLevelKit = do
-    level@(Def l [])     <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevel
-    zero@(Def z [])      <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelZero
-    suc@(Def s [])       <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelSuc
-    max@(Def m [])       <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelMax
+    level@(Def l [])     <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevel
+    zero@(Def z [])      <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelZero
+    suc@(Def s [])       <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelSuc
+    max@(Def m [])       <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelMax
     return $ LevelKit
       { lvlType  = level
       , lvlSuc   = \ a -> suc `apply1` a
@@ -80,10 +80,10 @@ builtinLevelKit = do
 -- | Raises an error if no level kit is available.
 requireLevels :: (HasBuiltins m, MonadTCError m) => m LevelKit
 requireLevels = do
-    level@(Def l [])     <- getBuiltin builtinLevel
-    zero@(Def z [])      <- getBuiltin builtinLevelZero
-    suc@(Def s [])       <- getBuiltin builtinLevelSuc
-    max@(Def m [])       <- getBuiltin builtinLevelMax
+    level@(Def l [])     <- getBuiltin BuiltinLevel
+    zero@(Def z [])      <- getBuiltin BuiltinLevelZero
+    suc@(Def s [])       <- getBuiltin BuiltinLevelSuc
+    max@(Def m [])       <- getBuiltin BuiltinLevelMax
     return $ LevelKit
       { lvlType  = level
       , lvlSuc   = \ a -> suc `apply1` a
@@ -102,11 +102,11 @@ haveLevels = caseMaybeM (allJustM $ map getBuiltin' levelBuiltins)
     (\ _bs -> return True)
   where
   levelBuiltins =
-    [ builtinLevelUniv
-    , builtinLevel
-    , builtinLevelZero
-    , builtinLevelSuc
-    , builtinLevelMax
+    [ BuiltinLevelUniv
+    , BuiltinLevel
+    , BuiltinLevelZero
+    , BuiltinLevelSuc
+    , BuiltinLevelMax
     ]
 
 {-# SPECIALIZE unLevel :: Term -> TCM Term #-}
@@ -151,9 +151,9 @@ levelView a = do
 
 levelView' :: PureTCM m => Term -> m Level
 levelView' a = do
-  Def lzero [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelZero
-  Def lsuc  [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelSuc
-  Def lmax  [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevelMax
+  Def lzero [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelZero
+  Def lsuc  [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelSuc
+  Def lmax  [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevelMax
   let view a = do
         ba <- reduceB a
         case ignoreBlocking ba of

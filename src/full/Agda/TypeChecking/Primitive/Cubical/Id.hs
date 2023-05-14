@@ -122,7 +122,7 @@ primConId' = do
         -- cases: If the cofibration is definitely true, then we return
         -- reflId.  TODO: Handle this in the conversion checker instead?
         IOne -> do
-          reflId <- getTerm (getBuiltinId builtinConId) builtinReflId
+          reflId <- getTerm (getBuiltinId PrimConId) BuiltinReflId
           redReturn $ reflId
         _ -> return $ NoReduction $ map notReduced [l,bA,x,y] ++ [reduced sphi, notReduced p]
     _ -> __IMPOSSIBLE_VERBOSE__ "implementation of primConId called with wrong arity"
@@ -146,7 +146,7 @@ primIdFace' = do
   return $ PrimImpl t $ primFun __IMPOSSIBLE__ 5 $ \case
     [l,bA,x,y,t] -> do
       st <- reduceB' t
-      mConId <- getName' builtinConId
+      mConId <- getName' PrimConId
       cview <- conidView'
       case cview (unArg x) $ unArg (ignoreBlocking st) of
         Just (phi, _) -> redReturn (unArg phi)
@@ -169,7 +169,7 @@ primIdPath' = do
   return $ PrimImpl t $ primFun __IMPOSSIBLE__ 5 $ \case
     [l,bA,x,y,t] -> do
       st <- reduceB' t
-      mConId <- getName' builtinConId
+      mConId <- getName' PrimConId
       cview <- conidView'
       case cview (unArg x) $ unArg (ignoreBlocking st) of
         Just (_, w) -> redReturn (unArg w)
@@ -203,10 +203,10 @@ doIdKanOp
   -> ReduceM (Maybe (Reduced t Term))
 doIdKanOp kanOp l bA_x_y = do
   let getTermLocal :: IsBuiltin a => a -> ReduceM Term
-      getTermLocal = getTerm $ kanOpName kanOp ++ " for " ++ getBuiltinId builtinId
+      getTermLocal = getTerm $ kanOpName kanOp ++ " for " ++ getBuiltinId BuiltinId
 
   unview <- intervalUnview'
-  mConId <- getName' builtinConId
+  mConId <- getName' PrimConId
   cview <- conidView'
   let isConId t = isJust $ cview __DUMMY_TERM__ t
 
@@ -224,13 +224,13 @@ doIdKanOp kanOp l bA_x_y = do
 
   case mConId of
     Just conid | isConId (unArg . ignoreBlocking $ sa0), b -> (Just <$>) . (redReturn =<<) $ do
-      tHComp    <- getTermLocal builtinHComp
-      tTrans    <- getTermLocal builtinTrans
-      tIMin     <- getTermLocal builtinDepIMin
-      idFace    <- getTermLocal builtinIdFace
-      idPath    <- getTermLocal builtinIdPath
-      tPathType <- getTermLocal builtinPath
-      tConId    <- getTermLocal builtinConId
+      tHComp    <- getTermLocal PrimHComp
+      tTrans    <- getTermLocal PrimTrans
+      tIMin     <- getTermLocal PrimDepIMin
+      idFace    <- getTermLocal PrimIdFace
+      idPath    <- getTermLocal PrimIdPath
+      tPathType <- getTermLocal BuiltinPath
+      tConId    <- getTermLocal PrimConId
 
       runNamesT [] $ do
         let

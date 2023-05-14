@@ -326,4 +326,4 @@ primBody s = maybe unimplemented (fromRight (hsVarUQ . HS.Ident) <$>) $ List.loo
   nLam x t = Lam (setHiding NotHidden defaultArgInfo) (Abs x t)
 
 noCheckCover :: (HasBuiltins m, MonadReduce m) => QName -> m Bool
-noCheckCover q = (||) <$> isBuiltin q builtinNat <*> isBuiltin q builtinInteger
+noCheckCover q = (||) <$> isBuiltin q BuiltinNat <*> isBuiltin q BuiltinInteger

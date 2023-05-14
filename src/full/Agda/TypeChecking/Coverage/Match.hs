@@ -482,12 +482,12 @@ isLitP (DotP _ u) = reduce u >>= \case
   Lit l -> return $ Just l
   _ -> return $ Nothing
 isLitP (ConP c ci []) = do
-  Con zero _ [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinZero
+  Con zero _ [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinZero
   if c == zero
     then return $ Just $ LitNat 0
     else return Nothing
 isLitP (ConP c ci [a]) | visible a && isRelevant a = do
-  Con suc _ [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSuc
+  Con suc _ [] <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSuc
   if c == suc
     then fmap inc <$> isLitP (namedArg a)
     else return Nothing
@@ -499,8 +499,8 @@ isLitP _ = return Nothing
 
 unLitP :: HasBuiltins m => Pattern' a -> m (Pattern' a)
 unLitP (LitP info l@(LitNat n)) | n >= 0 = do
-  Con c ci es <- constructorForm' (fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinZero)
-                                  (fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSuc)
+  Con c ci es <- constructorForm' (fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinZero)
+                                  (fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSuc)
                                   (Lit l)
   let toP (Apply (Arg i (Lit l))) = Arg i (LitP info l)
       toP _ = __IMPOSSIBLE__

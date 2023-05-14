@@ -151,8 +151,8 @@ match' ((c, es, patch) : stack) = do
                         (es1, es2)  = splitAt m rest
                         vs          = es1
             -- zo <- do
-            --    mi <- getBuiltinName' builtinIZero
-            --    mo <- getBuiltinName' builtinIOne
+            --    mi <- getBuiltinName' BuiltinIZero
+            --    mo <- getBuiltinName' BuiltinIOne
             --    return $ Set.fromList $ catMaybes [mi,mo]
 
             fallThrough <- return $ (Just True ==) (fallThrough bs) && isJust (catchAllBranch bs)

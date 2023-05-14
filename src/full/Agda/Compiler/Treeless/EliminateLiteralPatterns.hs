@@ -14,7 +14,7 @@ import Agda.Utils.Impossible
 
 eliminateLiteralPatterns :: TTerm -> TCM TTerm
 eliminateLiteralPatterns t = do
-  kit <- BuiltinKit <$> getBuiltinName builtinNat <*> getBuiltinName builtinInteger
+  kit <- BuiltinKit <$> getBuiltinName BuiltinNat <*> getBuiltinName BuiltinInteger
   return $ transform kit t
 
 data BuiltinKit = BuiltinKit

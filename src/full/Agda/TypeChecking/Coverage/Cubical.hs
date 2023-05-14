@@ -74,7 +74,7 @@ createMissingIndexedClauses :: QName
                             -> [Clause]
                             -> TCM ([(SplitTag,CoverResult)],[Clause])
 createMissingIndexedClauses f n x old_sc scs cs = do
-  reflId <- getName' builtinReflId
+  reflId <- getName' BuiltinReflId
   let infos = [(c,i) | (SplitCon c, (_,TheInfo i)) <- scs ]
   case scs of
     [(SplitCon c,(_newSc,i@TheInfo{}))] | Just c == reflId -> do
@@ -91,7 +91,7 @@ createMissingIndexedClauses f n x old_sc scs cs = do
             -- Andrea: what to do when we only managed to build a unification proof for some of the constructors?
          Constructor{conData} <- theDef <$> getConstInfo (fst (head infos))
          Datatype{dataPars = pars, dataIxs = nixs, dataTranspIx} <- theDef <$> getConstInfo conData
-         hcomp <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinHComp
+         hcomp <- fromMaybe __IMPOSSIBLE__ <$> getName' PrimHComp
          trX <- fromMaybe __IMPOSSIBLE__ <$> pure dataTranspIx
          trX_cl <- createMissingTrXTrXClause trX f n x old_sc
          hcomp_cl <- createMissingTrXHCompClause trX f n x old_sc
@@ -429,7 +429,7 @@ createMissingTrXHCompClause q_trX f n x old_sc = do
   -- Ξ ⊢ w0 := f old_ps[γ1,x = pat_rec[1] ,δ_f[1]] : old_t[γ1,x = pat_rec[1],δ_f[1]]
   -- Ξ ⊢ rhs := tr (i. old_t[γ1,x = pat_rec[~i], δ_f[~i]]) (φ ∧ ψ) w0 -- TODO plus sides.
 
-  q_hcomp <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinHComp
+  q_hcomp <- fromMaybe __IMPOSSIBLE__ <$> getName' PrimHComp
   let
    old_tel = scTel old_sc
    old_ps = fromSplitPatterns $ scPats old_sc
@@ -870,7 +870,7 @@ createMissingTrXConClause q_trX f n x old_sc c (UE gamma gamma' xTel u v rho tau
     (,,) <$> ps <*> rhsTy <*> rhs
 
   let (ps,ty,rhs) = unAbsN $ unAbsN $ unAbs $ unAbsN $ ps_ty_rhs
-  qs <- mapM (fmap (fromMaybe __IMPOSSIBLE__) . getName') [builtinINeg, builtinIMax, builtinIMin]
+  qs <- mapM (fmap (fromMaybe __IMPOSSIBLE__) . getName') [PrimINeg, PrimIMax, PrimIMin]
   rhs <- addContext cTel $
            locallyReduceDefs (OnlyReduceDefs (Set.fromList $ q_trX : qs)) $ normalise rhs
   let cl = Clause { clauseLHSRange  = noRange
@@ -929,8 +929,8 @@ createMissingConIdClause f _n x old_sc (TheInfo info) = setCurrentRange f $ do
     ileftInv = infoLeftInv info
   interval <- elInf primInterval
   tTrans  <- primTrans
-  tComp  <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinComp
-  conId <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinConId
+  tComp  <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimComp
+  conId <- fromMaybe __IMPOSSIBLE__ <$> getName' PrimConId
   let bindSplit (tel1,tel2) = (tel1,AbsN (teleNames tel1) tel2)
   let
       old_tel = scTel old_sc
@@ -1082,7 +1082,7 @@ createMissingConIdClause f _n x old_sc (TheInfo info) = setCurrentRange f $ do
         return $ (phi,tm_phi) : concatMap (\(v,(l,r)) -> [(neg `apply` [argN v],l),(v,r)]) xs
 
     let imax i j = apply max $ map argN [i,j]
-    tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinPOr
+    tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimPOr
     let
       pOr l ty phi psi u0 u1 = do
           [phi,psi] <- mapM open [phi,psi]
@@ -1171,8 +1171,8 @@ createMissingHCompClause f n x old_sc (SClause tel ps _sigma' _cps (Just t)) cs 
   reportSDoc "tc.cover.hcomp" 30 $ addContext tel $ text "ps = " <+> prettyTCMPatternList (fromSplitPatterns ps)
   reportSDoc "tc.cover.hcomp" 30 $ text "tel = " <+> prettyTCM tel
 
-  io      <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIOne
-  iz      <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIZero
+  io      <- fromMaybe __IMPOSSIBLE__ <$> getTerm' BuiltinIOne
+  iz      <- fromMaybe __IMPOSSIBLE__ <$> getTerm' BuiltinIZero
   let
     cannotCreate :: MonadTCError m => Doc -> Closure (Abs Type) -> m a
     cannotCreate doc t = do
@@ -1239,12 +1239,12 @@ createMissingHCompClause f n x old_sc (SClause tel ps _sigma' _cps (Just t)) cs 
       --                 (g[x = u0,δ_fill[0]]) : old_t[x = hcomp φ u u0,δ]
 
       runNamesT [] $ do
-          tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinPOr
-          tIMax <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIMax
-          tIMin <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIMin
-          tINeg <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinINeg
-          tHComp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinHComp
-          tTrans <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinTrans
+          tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimPOr
+          tIMax <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimIMax
+          tIMin <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimIMin
+          tINeg <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimINeg
+          tHComp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimHComp
+          tTrans <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimTrans
           extra_ps <- open $ patternsToElims $ fromSplitPatterns $ drop (length old_ps) ps
           let
             ineg j = pure tINeg <@> j
@@ -1386,6 +1386,6 @@ createMissingHCompClause f n x old_sc (SClause tel ps _sigma' _cps (Just t)) cs 
           , coverPatterns       = [cl]
           , coverNoExactClauses = IntSet.empty
           }
-  hcompName <- fromMaybe __IMPOSSIBLE__ <$> getName' builtinHComp
+  hcompName <- fromMaybe __IMPOSSIBLE__ <$> getName' PrimHComp
   return ([(SplitCon hcompName,result)],cs++[cl])
 createMissingHCompClause _ _ _ _ (SClause _ _ _ _ Nothing) _ = __IMPOSSIBLE__

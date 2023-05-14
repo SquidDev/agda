@@ -56,16 +56,16 @@ doHCompUKanOp
 -- Can we deduplicate them?
 doHCompUKanOp (HCompOp psi u u0) (IsNot (la, phi, bT, bA)) tpos = do
   let getTermLocal :: IsBuiltin a => a -> m Term
-      getTermLocal = getTerm $ getBuiltinId builtinHComp ++ " for " ++ getBuiltinId builtinHComp ++ " of Set"
-  io       <- getTermLocal builtinIOne
-  iz       <- getTermLocal builtinIZero
-  tHComp   <- getTermLocal builtinHComp
-  tTransp  <- getTermLocal builtinTrans
-  tglue    <- getTermLocal builtin_glueU
-  tunglue  <- getTermLocal builtin_unglueU
-  tLSuc    <- getTermLocal builtinLevelSuc
-  tSubIn   <- getTermLocal builtinSubIn
-  tItIsOne <- getTermLocal builtinItIsOne
+      getTermLocal = getTerm $ getBuiltinId PrimHComp ++ " for " ++ getBuiltinId PrimHComp ++ " of Set"
+  io       <- getTermLocal BuiltinIOne
+  iz       <- getTermLocal BuiltinIZero
+  tHComp   <- getTermLocal PrimHComp
+  tTransp  <- getTermLocal PrimTrans
+  tglue    <- getTermLocal Prim_glueU
+  tunglue  <- getTermLocal Prim_unglueU
+  tLSuc    <- getTermLocal BuiltinLevelSuc
+  tSubIn   <- getTermLocal BuiltinSubIn
+  tItIsOne <- getTermLocal BuiltinItIsOne
   runNamesT [] $ do
     [psi, u, u0] <- mapM (open . unArg) [ignoreBlocking psi, u, u0]
     [la, phi, bT, bA] <- mapM (open . unArg) [la, phi, bT, bA]
@@ -96,23 +96,23 @@ doHCompUKanOp (HCompOp psi u u0) (IsNot (la, phi, bT, bA)) tpos = do
 
 doHCompUKanOp (TranspOp psi u0) (IsFam (la, phi, bT, bA)) tpos = do
   let
-    localUse = getBuiltinId builtinTrans ++ " for " ++ getBuiltinId builtinHComp ++ " of Set"
+    localUse = getBuiltinId PrimTrans ++ " for " ++ getBuiltinId PrimHComp ++ " of Set"
     getTermLocal :: IsBuiltin a => a -> m Term
     getTermLocal = getTerm localUse
-  tPOr <- getTermLocal builtinPOr
-  tIMax <- getTermLocal builtinIMax
-  tIMin <- getTermLocal builtinIMin
-  tINeg <- getTermLocal builtinINeg
-  tHComp <- getTermLocal builtinHComp
-  tTrans <- getTermLocal builtinTrans
-  tTranspProof <- getTermLocal builtinTranspProof
-  tSubIn <- getTermLocal builtinSubIn
-  tForall  <- getTermLocal builtinFaceForall
-  io      <- getTermLocal builtinIOne
-  iz      <- getTermLocal builtinIZero
-  tLSuc   <- getTermLocal builtinLevelSuc
-  tPath   <- getTermLocal builtinPath
-  tItIsOne   <- getTermLocal builtinItIsOne
+  tPOr <- getTermLocal PrimPOr
+  tIMax <- getTermLocal PrimIMax
+  tIMin <- getTermLocal PrimIMin
+  tINeg <- getTermLocal PrimINeg
+  tHComp <- getTermLocal PrimHComp
+  tTrans <- getTermLocal PrimTrans
+  tTranspProof <- getTermLocal BuiltinTranspProof
+  tSubIn <- getTermLocal BuiltinSubIn
+  tForall  <- getTermLocal PrimFaceForall
+  io      <- getTermLocal BuiltinIOne
+  iz      <- getTermLocal BuiltinIZero
+  tLSuc   <- getTermLocal BuiltinLevelSuc
+  tPath   <- getTermLocal BuiltinPath
+  tItIsOne   <- getTermLocal BuiltinItIsOne
   kit <- fromMaybe __IMPOSSIBLE__ <$> getSigmaKit
   runNamesT [] $ do
     -- Helper definitions we'll use:
@@ -128,7 +128,7 @@ doHCompUKanOp (TranspOp psi u0) (IsFam (la, phi, bT, bA)) tpos = do
 
     [psi, u0] <- mapM (open . unArg) [ignoreBlocking psi, u0]
     glue1 <- do
-      tglue             <- cl $ getTermLocal builtin_glueU
+      tglue             <- cl $ getTermLocal Prim_glueU
       [la, phi, bT, bA] <- mapM (open . unArg . subst 0 io) $ [la, phi, bT, bA]
       let bAS = pure tSubIn <#> (pure tLSuc <@> la) <#> (Sort . tmSort <$> la) <#> phi <@> bA
       g <- (open =<<) $ pure tglue <#> la <#> phi <#> bT <#> bAS
@@ -141,7 +141,7 @@ doHCompUKanOp (TranspOp psi u0) (IsFam (la, phi, bT, bA)) tpos = do
     -- also to @doHCompUKanOp DoTransp@, as suggested by Tom Jack and Anders Mörtberg.
     -- We define @unglue_u0 i@ that is first used with @i@ and then with @i0@.
     -- The original code used it only with @i0@.
-    tunglue <- cl $ getTermLocal builtin_unglueU
+    tunglue <- cl $ getTermLocal Prim_unglueU
     let
       bAS i = pure tSubIn
         <#> (pure tLSuc <@> (la <@> i)) <#> (Sort . tmSort <$> (la <@> i)) <#> (phi <@> i)
@@ -247,9 +247,9 @@ prim_unglueU' = do
 
   view <- intervalView'
   one <- primItIsOne
-  mglueU <- getPrimitiveName' builtin_glueU
-  mtransp <- getPrimitiveName' builtinTrans
-  mHCompU <- getPrimitiveName' builtinHComp
+  mglueU <- getPrimitiveName' Prim_glueU
+  mtransp <- getPrimitiveName' PrimTrans
+  mHCompU <- getPrimitiveName' PrimHComp
   let mhcomp = mHCompU
 
   return $ PrimImpl t $ primFun __IMPOSSIBLE__ 5 $ \case
@@ -259,9 +259,9 @@ prim_unglueU' = do
         -- Case where the hcomp has reduced away: Transport backwards
         -- along the partial element we've glued.
         IOne -> do
-          tTransp <- getTerm (getBuiltinId builtin_unglueU) builtinTrans
-          iNeg    <- getTerm (getBuiltinId builtin_unglueU) builtinINeg
-          iZ      <- getTerm (getBuiltinId builtin_unglueU) builtinIZero
+          tTransp <- getTerm (getBuiltinId Prim_unglueU) PrimTrans
+          iNeg    <- getTerm (getBuiltinId Prim_unglueU) PrimINeg
+          iZ      <- getTerm (getBuiltinId Prim_unglueU) BuiltinIZero
           redReturn <=< runNamesT [] $ do
             [la,bT,b] <- mapM (open . unArg) [la,bT,b]
             pure tTransp <#> lam "i" (\ _ -> la) <@> lam "i" (\ i -> bT <@> ineg i <..> pure one)

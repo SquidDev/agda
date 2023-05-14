@@ -130,7 +130,7 @@ primDepIMin' = do
     [x,y] -> do
       sx <- reduceB' x
       ix <- intervalView (unArg $ ignoreBlocking sx)
-      itisone <- getTerm "primDepIMin" builtinItIsOne
+      itisone <- getTerm "primDepIMin" BuiltinItIsOne
       case ix of
         -- Σ 0 iy is 0, and additionally P is def.eq. to isOneEmpty.
         IZero -> redReturn =<< intervalUnview IZero
@@ -313,10 +313,10 @@ combineSys'
   -> [(NamesT m Term, NamesT m Term)]
   -> NamesT m (Term,Term)
 combineSys' l ty xs = do
-  tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinPOr
-  tMax <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIMax
-  iz <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIZero
-  tEmpty <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinIsOneEmpty
+  tPOr <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimPOr
+  tMax <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimIMax
+  iz <- fromMaybe __IMPOSSIBLE__ <$> getTerm' BuiltinIZero
+  tEmpty <- fromMaybe __IMPOSSIBLE__ <$> getTerm' BuiltinIsOneEmpty
 
   let
     pOr l ty phi psi u0 u1 = pure tPOr
@@ -345,7 +345,7 @@ fiber
   -> NamesT m Term -- @x : B@
   -> NamesT m Term -- @Σ[ x ∈ A ] (f a ≡ x)@
 fiber la lb bA bB f b = do
-  tPath <- getTerm "fiber" builtinPath
+  tPath <- getTerm "fiber" BuiltinPath
   kit <- fromMaybe __IMPOSSIBLE__ <$> getSigmaKit
   pure (Def (sigmaName kit) [])
     <#> la <#> lb
@@ -364,7 +364,7 @@ hfill
   -> NamesT m Term -- @i : I@. Position along the cube.
   -> NamesT m Term
 hfill la bA phi u u0 i = do
-  tHComp <- getTerm "hfill" builtinHComp
+  tHComp <- getTerm "hfill" PrimHComp
   pure tHComp <#> la <#> bA <#> (imax phi (ineg i))
     <@> lam "j" (\ j -> combineSys la bA
         [ (phi,    ilam "o" (\o -> u <@> (imin i j) <..> o))
@@ -431,7 +431,7 @@ reduce2Lam t = do
 isCubicalSubtype :: PureTCM m => Type -> m (Maybe (Term, Term, Term, Term))
 isCubicalSubtype t = do
   t <- reduce t
-  msub <- getBuiltinName' builtinSub
+  msub <- getBuiltinName' BuiltinSub
   case unEl t of
     Def q es | Just q == msub, Just (level:typ:phi:ext:_) <- allApplyElims es -> do
       pure (pure (unArg level, unArg typ, unArg phi, unArg ext))

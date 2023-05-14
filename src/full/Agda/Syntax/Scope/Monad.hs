@@ -39,9 +39,7 @@ import Agda.Syntax.Concrete.Definitions ( DeclarationWarning(..) ,DeclarationWar
 import Agda.Syntax.Scope.Base as A
 
 import Agda.TypeChecking.Monad.Base
-import Agda.TypeChecking.Monad.Builtin
-  ( HasBuiltins, getBuiltinName'
-  , builtinSet, builtinStrictSet, builtinProp, builtinSetOmega, builtinSSetOmega )
+import Agda.TypeChecking.Monad.Builtin ( HasBuiltins, getBuiltinName' , BuiltinId(..) )
 import Agda.TypeChecking.Monad.Debug
 import Agda.TypeChecking.Monad.State
 import Agda.TypeChecking.Monad.Trace
@@ -416,11 +414,11 @@ tryResolveName kinds names x = do
 --   only true for the names of builtin sorts.
 canHaveSuffixTest :: HasBuiltins m => m (A.QName -> Bool)
 canHaveSuffixTest = do
-  builtinSet  <- getBuiltinName' builtinSet
-  builtinSSet <- getBuiltinName' builtinStrictSet
-  builtinProp <- getBuiltinName' builtinProp
-  builtinSetOmega <- getBuiltinName' builtinSetOmega
-  builtinSSetOmega <- getBuiltinName' builtinSSetOmega
+  builtinSet  <- getBuiltinName' BuiltinSet
+  builtinSSet <- getBuiltinName' BuiltinStrictSet
+  builtinProp <- getBuiltinName' BuiltinProp
+  builtinSetOmega <- getBuiltinName' BuiltinSetOmega
+  builtinSSetOmega <- getBuiltinName' BuiltinSSetOmega
   return $ \x -> Just x `elem` [builtinSet, builtinSSet, builtinProp, builtinSetOmega, builtinSSetOmega]
 
 -- | Look up a module in the scope.

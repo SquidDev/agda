@@ -350,9 +350,9 @@ getTypeInfo t0 = do
   typeInfo :: QName -> E TypeInfo
   typeInfo q = ifM (erasureForbidden q) (return NotErasable) $ {-else-} do
     memoRec (typeMap . key q) Erasable $ do  -- assume recursive occurrences are erasable
-      mId    <- lift $ getName' builtinId
+      mId    <- lift $ getName' BuiltinId
       msizes <- lift $ mapM getBuiltinName
-                         [builtinSize, builtinSizeLt]
+                         [BuiltinSize, BuiltinSizeLt]
       def    <- lift $ getConstInfo q
       let mcs = case I.theDef def of
                   I.Datatype{ dataCons = cs } -> Just cs

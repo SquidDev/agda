@@ -19,7 +19,7 @@ import Agda.TypeChecking.Reduce
 import Agda.TypeChecking.Reduce.Monad
 import Agda.TypeChecking.Substitute
 import Agda.TypeChecking.Monad hiding (constructorForm)
-import Agda.TypeChecking.Monad.Builtin (getName',builtinHComp, builtinConId)
+import Agda.TypeChecking.Monad.Builtin (getName',PrimitiveId(..))
 import Agda.TypeChecking.Pretty
 import Agda.TypeChecking.Records
 
@@ -263,7 +263,7 @@ matchPattern p u = case (p, u) of
   -- can be matched on.
   isMatchable' :: HasBuiltins m => m (Blocked Term -> Maybe Term)
   isMatchable' = do
-    [mhcomp,mconid] <- mapM getName' [builtinHComp, builtinConId]
+    [mhcomp,mconid] <- mapM getName' [PrimHComp, PrimConId]
     return $ \ r ->
       case ignoreBlocking r of
         t@Con{} -> Just t

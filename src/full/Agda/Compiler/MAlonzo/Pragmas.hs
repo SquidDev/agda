@@ -137,9 +137,9 @@ sanityCheckPragma def (Just HsType{}) =
     Axiom{} -> return ()
     Datatype{} -> do
       -- We use HsType pragmas for Nat, Int and Bool
-      nat  <- getBuiltinName builtinNat
-      int  <- getBuiltinName builtinInteger
-      bool <- getBuiltinName builtinBool
+      nat  <- getBuiltinName BuiltinNat
+      int  <- getBuiltinName BuiltinInteger
+      bool <- getBuiltinName BuiltinBool
       unless (Just (defName def) `elem` [nat, int, bool]) err
     _ -> err
   where

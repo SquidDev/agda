@@ -563,7 +563,7 @@ checkSystemCoverage f [n] t cs = do
 
   case a of
     Def q [Apply phi] -> do
-      [iz,io] <- mapM getBuiltinName' [builtinIZero, builtinIOne]
+      [iz,io] <- mapM getBuiltinName' [BuiltinIZero, BuiltinIOne]
       ineg <- primINeg
       imin <- primIMin
       imax <- primIMax

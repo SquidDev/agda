@@ -245,7 +245,7 @@ instance Match NLPSort Sort where
 
 instance Match NLPat Level where
   match r gamma k _ p l = do
-    t <- El (mkType 0) . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinLevel
+    t <- El (mkType 0) . fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinLevel
     v <- reallyUnLevelView l
     match r gamma k t p v
 

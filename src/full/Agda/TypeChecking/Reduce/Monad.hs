@@ -35,8 +35,8 @@ instance HasBuiltins ReduceM where
 
 constructorForm :: HasBuiltins m => Term -> m Term
 constructorForm v = do
-  mz <- getBuiltin' builtinZero
-  ms <- getBuiltin' builtinSuc
+  mz <- getBuiltin' BuiltinZero
+  ms <- getBuiltin' BuiltinSuc
   return $ fromMaybe v $ constructorForm' mz ms v
 
 enterClosure :: LensClosure c a => c -> (a -> ReduceM b) -> ReduceM b

@@ -503,7 +503,7 @@ cover f cs sc@(SClause tel ps _ _ target) = updateRelevance $ do
           (results_trX, cs) <- createMissingIndexedClauses f n x sc scs' cs
           (scs, cs, results_hc) <- do
             let fallback = return (scs, cs, [])
-            caseMaybeM (getPrimitiveName' builtinHComp) fallback $ \ comp -> do
+            caseMaybeM (getPrimitiveName' PrimHComp) fallback $ \ comp -> do
             let isComp = \case
                   SplitCon c -> comp == c
                   _ -> False
@@ -712,8 +712,8 @@ isDatatype ind at = do
   let t       = unDom at
       throw f = throwError . f =<< do liftTCM $ buildClosure t
   t' <- liftTCM $ reduce t
-  mInterval <- liftTCM $ getBuiltinName' builtinInterval
-  mIsOne <- liftTCM $ getBuiltinName' builtinIsOne
+  mInterval <- liftTCM $ getBuiltinName' BuiltinInterval
+  mIsOne <- liftTCM $ getBuiltinName' BuiltinIsOne
   case unEl t' of
     Def d [] | Just d == mInterval -> throw NotADatatype
     Def d [Apply phi] | Just d == mIsOne -> do
@@ -863,7 +863,7 @@ computeHCompSplit delta1 n delta2 d pars ixs hix tel ps cps = do
     -- Get the type of the datatype
   -- Δ1 ⊢ dtype
   dsort <- liftTCM $ (parallelS (reverse $ map unArg pars) `applySubst`) . dataSort . theDef <$> getConstInfo d
-  hCompName <- fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' builtinHComp
+  hCompName <- fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' PrimHComp
   theHCompT <- defType <$> getConstInfo hCompName
 
   -- TODO can dsort be blocked or not in whnf?
@@ -1313,7 +1313,7 @@ split' checkEmpty ind allowPartialCover inserttrailing
     DoInsertTrailing   -> lift $ forM ns $ \(con,(sc,info)) ->
       (con,) . (,info) . snd <$> insertTrailingArgs False sc
 
-  mHCompName <- getPrimitiveName' builtinHComp
+  mHCompName <- getPrimitiveName' PrimHComp
   opts       <- pragmaOptions
   let withoutK        = optWithoutK opts
       erasedMatches   = optErasedMatches opts

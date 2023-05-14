@@ -34,7 +34,7 @@ import Agda.Utils.Impossible
 --   Γ ⊢ telePiPath f Δ t bs
 telePiPath :: (Abs Type -> Abs Type) -> ([Arg ArgName] -> Term -> Term) -> Telescope -> Type -> Boundary -> TCM Type
 telePiPath reAbs lams tel t bs = do
-  mpp <- getTerm' builtinPathP
+  mpp <- getTerm' BuiltinPathP
   io <- primIOne
   let
     argN = Arg defaultArgInfo
@@ -119,7 +119,7 @@ instance IApplyVars p => IApplyVars [p] where
 -- | Check whether a type is the built-in interval type.
 isInterval :: (MonadTCM m, MonadReduce m) => Type -> m Bool
 isInterval t = liftTCM $ do
-  caseMaybeM (getName' builtinInterval) (return False) $ \ i -> do
+  caseMaybeM (getName' BuiltinInterval) (return False) $ \ i -> do
   reduce (unEl t) <&> \case
     Def q [] -> q == i
     _        -> False

@@ -196,7 +196,7 @@ isBoundedSizeType :: PureTCM m => Type -> m BoundedSize
 isBoundedSizeType t =
   reduce (unEl t) >>= \case
     Def x [Apply u] -> do
-      sizelt <- getBuiltin' builtinSizeLt
+      sizelt <- getBuiltin' BuiltinSizeLt
       return $ if (Just (Def x []) == sizelt) then BoundedLt $ unArg u else BoundedNo
     _ -> return BoundedNo
 
@@ -281,9 +281,9 @@ deepSizeView v = do
 
 sizeMaxView :: PureTCM m => Term -> m SizeMaxView
 sizeMaxView v = do
-  inf <- getBuiltinDefName builtinSizeInf
-  suc <- getBuiltinDefName builtinSizeSuc
-  max <- getBuiltinDefName builtinSizeMax
+  inf <- getBuiltinDefName BuiltinSizeInf
+  suc <- getBuiltinDefName BuiltinSizeSuc
+  max <- getBuiltinDefName BuiltinSizeMax
   let loop v = do
         v <- reduce v
         case v of

@@ -475,13 +475,13 @@ checkHeadApplication :: Comparison -> A.Expr -> Type -> A.Expr -> [NamedArg A.Ex
 checkHeadApplication cmp e t hd args = do
   SortKit{..} <- sortKit
   sharp <- fmap nameOfSharp <$> coinductionKit
-  conId  <- getNameOfConstrained builtinConId
-  pOr    <- getNameOfConstrained builtinPOr
-  pComp  <- getNameOfConstrained builtinComp
-  pHComp <- getNameOfConstrained builtinHComp
-  pTrans <- getNameOfConstrained builtinTrans
-  mglue  <- getNameOfConstrained builtin_glue
-  mglueU  <- getNameOfConstrained builtin_glueU
+  conId  <- getNameOfConstrained PrimConId
+  pOr    <- getNameOfConstrained PrimPOr
+  pComp  <- getNameOfConstrained PrimComp
+  pHComp <- getNameOfConstrained PrimHComp
+  pTrans <- getNameOfConstrained PrimTrans
+  mglue  <- getNameOfConstrained Prim_glue
+  mglueU  <- getNameOfConstrained Prim_glueU
   case hd of
     A.Def' c s | c == nameOfSet      -> checkSet cmp e t c s args
     A.Def' c s | c == nameOfProp     -> checkProp cmp e t c s args

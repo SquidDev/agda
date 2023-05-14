@@ -140,7 +140,7 @@ primSubOut' = do
           IOne -> redReturn =<< (return (unArg u) <..> getTerm (getBuiltinId PrimSubOut) BuiltinItIsOne)
           _ -> do
             sx <- reduceB' x
-            mSubIn <- getBuiltinName' builtinSubIn
+            mSubIn <- getBuiltinName' BuiltinSubIn
             case unArg $ ignoreBlocking $ sx of
               Def q [_,_,_, Apply t] | Just q == mSubIn -> redReturn (unArg t)
               _ -> return $ NoReduction $ map notReduced [a,bA] ++ [reduced sphi, notReduced u, reduced sx]
@@ -177,12 +177,12 @@ mkComp :: forall m. HasBuiltins m
 mkComp s = do
   let getTermLocal :: IsBuiltin a => a -> NamesT m Term
       getTermLocal = getTerm s
-  tIMax  <- getTermLocal builtinIMax
-  tINeg  <- getTermLocal builtinINeg
-  tHComp <- getTermLocal builtinHComp
-  tTrans <- getTermLocal builtinTrans
-  iz     <- getTermLocal builtinIZero
-  io     <- getTermLocal builtinIOne
+  tIMax  <- getTermLocal PrimIMax
+  tINeg  <- getTermLocal PrimINeg
+  tHComp <- getTermLocal PrimHComp
+  tTrans <- getTermLocal PrimTrans
+  iz     <- getTermLocal BuiltinIZero
+  io     <- getTermLocal BuiltinIOne
 
   let
     forward la bA r u = pure tTrans
@@ -205,7 +205,7 @@ mkCompLazy
   -> NamesT m (NamesT m Term -> NamesT m Term -> NamesT m Term -> NamesT m Term -> NamesT m Term -> NamesT m Term)
 mkCompLazy s = do
   let getTermLocal = getTerm s
-  tComp <- getTermLocal builtinComp
+  tComp <- getTermLocal PrimComp
   pure $ \la bA phi u u0 -> pure tComp <#> la <#> bA <#> phi <@> u <@> u0
 
 -- | Implementation of Kan operations for Pi types. The implementation
@@ -220,11 +220,11 @@ doPiKanOp
 doPiKanOp cmd t ab = do
   let getTermLocal :: IsBuiltin a => a -> ReduceM Term
       getTermLocal = getTerm $ kanOpName cmd ++ " for function types"
-  tTrans <- getTermLocal builtinTrans
-  tHComp <- getTermLocal builtinHComp
-  tINeg <- getTermLocal builtinINeg
-  tIMax <- getTermLocal builtinIMax
-  iz    <- getTermLocal builtinIZero
+  tTrans <- getTermLocal PrimTrans
+  tHComp <- getTermLocal PrimHComp
+  tINeg <- getTermLocal PrimINeg
+  tIMax <- getTermLocal PrimIMax
+  iz    <- getTermLocal BuiltinIZero
 
   -- We must guarantee that the codomain is a fibrant type, i.e. one
   -- that supports hcomp and transp. Otherwise, what are we even doing!
@@ -269,7 +269,7 @@ doPiKanOp cmd t ab = do
         -- adjustment, though!
         IntervalUniv -> do
           x' <- reduceB $ unDom x
-          mInterval <- getBuiltinName' builtinInterval
+          mInterval <- getBuiltinName' BuiltinInterval
           case unEl $ ignoreBlocking x' of
             Def q [] | Just q == mInterval -> return $ Just $ \_ _ a0 -> a0
             _ -> return Nothing
@@ -329,7 +329,7 @@ doPathPKanOp
   -> ReduceM (Reduced MaybeReducedArgs Term)
 doPathPKanOp (HCompOp phi u u0) (IsNot l) (IsNot (bA,x,y)) = do
   let getTermLocal = getTerm "primHComp for path types"
-  tHComp <- getTermLocal builtinHComp
+  tHComp <- getTermLocal PrimHComp
 
   redReturn <=< runNamesT [] $ do
     [l, u, u0, phi, bA, x, y] <- mapM (open . unArg) [l, u, u0, ignoreBlocking phi, bA, x, y]
@@ -347,8 +347,8 @@ doPathPKanOp (HCompOp phi u u0) (IsNot l) (IsNot (bA,x,y)) = do
 
 doPathPKanOp (TranspOp phi u0) (IsFam l) (IsFam (bA,x,y)) = do
   let getTermLocal = getTerm "transport for path types"
-  iz <- getTermLocal builtinIZero
-  io <- getTermLocal builtinIOne
+  iz <- getTermLocal BuiltinIZero
+  io <- getTermLocal BuiltinIOne
 
   -- Transport in path types becomes /CCHM/ composition in the
   -- underlying line of spaces. The intuition is that not only do we
@@ -413,7 +413,7 @@ primTransHComp cmd ts nelims = do
         -- to extend. But now it's just a total element, so we can
         -- just.. return it:
         u <- open $ unArg $ fromMaybe __IMPOSSIBLE__ u
-        u <@> clP builtinIOne <..> clP builtinItIsOne
+        u <@> clP BuiltinIOne <..> clP BuiltinItIsOne
       DoTransp ->
         -- Otherwise we're in the constant part of the line to transport
         -- over, so we must return the argument unchanged.
@@ -432,7 +432,7 @@ primTransHComp cmd ts nelims = do
             -- isOneEmpty is *tiny*, so let's use that:
             IZero -> fmap (reduced . notBlocked . argN) . runNamesT [] $ do
                 [l,c] <- mapM (open . unArg) [famThing l, ignoreBlocking sc]
-                lam "i" $ \ i -> clP builtinIsOneEmpty <#> l <#> ilam "o" (\ _ -> c)
+                lam "i" $ \ i -> clP BuiltinIsOneEmpty <#> l <#> ilam "o" (\ _ -> c)
 
             -- Otherwise we have some interesting formula (though
             -- definitely not IOne!) and we have to keep the partial
@@ -464,9 +464,9 @@ primTransHComp cmd ts nelims = do
             DoHComp -> HCompOp
               { kanOpCofib = sphi, kanOpSides = fromMaybe __IMPOSSIBLE__ u, kanOpBase = u0 }
 
-        mHComp <- getPrimitiveName' builtinHComp
-        mGlue <- getPrimitiveName' builtinGlue
-        mId   <- getBuiltinName' builtinId
+        mHComp <- getPrimitiveName' PrimHComp
+        mGlue <- getPrimitiveName' PrimGlue
+        mId   <- getBuiltinName' BuiltinId
         pathV <- pathView'
 
         -- By cases on the family, determine what Kan operation we defer
@@ -584,21 +584,21 @@ primTransHComp cmd ts nelims = do
             return $ (flags,t_alphas)
     compData mtrD False _ cmd@DoHComp (IsNot l) (IsNot ps) fsc sphi (Just u) a0 = do
       let getTermLocal :: IsBuiltin a => a -> ReduceM Term
-          getTermLocal = getTerm $ "builtinHComp for data types"
+          getTermLocal = getTerm $ "PrimHComp for data types"
 
       let sc = famThing <$> fsc
-      tEmpty <- getTermLocal builtinIsOneEmpty
-      tPOr   <- getTermLocal builtinPOr
-      iO   <- getTermLocal builtinIOne
-      iZ   <- getTermLocal builtinIZero
-      tMin <- getTermLocal builtinIMin
-      tNeg <- getTermLocal builtinINeg
+      tEmpty <- getTermLocal BuiltinIsOneEmpty
+      tPOr   <- getTermLocal PrimPOr
+      iO   <- getTermLocal BuiltinIOne
+      iZ   <- getTermLocal BuiltinIZero
+      tMin <- getTermLocal PrimIMin
+      tNeg <- getTermLocal PrimINeg
       let iNeg t = tNeg `apply` [argN t]
           iMin t u = tMin `apply` [argN t, argN u]
           iz = pure iZ
       constrForm <- do
-        mz <- getTerm' builtinZero
-        ms <- getTerm' builtinSuc
+        mz <- getTerm' BuiltinZero
+        ms <- getTerm' BuiltinSuc
         return $ \ t -> fromMaybe t (constructorForm' mz ms t)
       su  <- reduceB' u
       sa0 <- reduceB' a0
@@ -671,12 +671,12 @@ primTransHComp cmd ts nelims = do
 
     compData mtrD isHIT _ cmd@DoTransp (IsFam l) (IsFam ps) fsc sphi Nothing a0 = do
       let getTermLocal :: IsBuiltin a => a -> ReduceM Term
-          getTermLocal = getTerm $ getBuiltinId builtinTrans ++ " for data types"
+          getTermLocal = getTerm $ getBuiltinId PrimTrans ++ " for data types"
       let sc = famThing <$> fsc
-      mhcompName <- getName' builtinHComp
+      mhcompName <- getName' PrimHComp
       constrForm <- do
-        mz <- getTerm' builtinZero
-        ms <- getTerm' builtinSuc
+        mz <- getTerm' BuiltinZero
+        ms <- getTerm' BuiltinSuc
         return $ \ t -> fromMaybe t (constructorForm' mz ms t)
       sa0 <- reduceB' a0
       let f = unArg . ignoreBlocking
@@ -693,10 +693,10 @@ primTransHComp cmd ts nelims = do
               Nothing        -> noRed
         Def q es | isHIT, Just q == mhcompName, Just [_l0,_c0,psi,u,u0] <- allApplyElims es -> do
            let bC = ignoreBlocking sc
-           hcomp <- getTermLocal builtinHComp
-           transp <- getTermLocal builtinTrans
-           io <- getTermLocal builtinIOne
-           iz <- getTermLocal builtinIZero
+           hcomp <- getTermLocal PrimHComp
+           transp <- getTermLocal PrimTrans
+           io <- getTermLocal BuiltinIOne
+           iz <- getTermLocal BuiltinIZero
            redReturn <=< runNamesT [] $ do
              [l,bC,phi,psi,u,u0] <- mapM (open . unArg) [l,bC,ignoreBlocking sphi,psi,u,u0]
              -- hcomp (sc 1) [psi |-> transp sc phi u] (transp sc phi u0)
@@ -849,8 +849,8 @@ transpSysTel' flag delta us phi args = do
   let getTermLocal :: IsBuiltin a => a -> ExceptT e m Term
       getTermLocal = getTerm "transpSys"
   tTransp <- lift primTrans
-  tComp <- getTermLocal builtinComp
-  tPOr <- getTermLocal builtinPOr
+  tComp <- getTermLocal PrimComp
+  tPOr <- getTermLocal PrimPOr
   iz <- lift primIZero
   imin <- lift primIMin
   imax <- lift primIMax
@@ -1036,7 +1036,7 @@ pathTelescope'
   -> [Arg Term] -- rhs : Δ
   -> m Telescope
 pathTelescope' tel lhs rhs = do
-  pathp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinPathP
+  pathp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' BuiltinPathP
   go pathp (raise 1 tel) lhs rhs
  where
   -- Γ,i ⊢ Δ, Γ ⊢ lhs : Δ[0], Γ ⊢ rhs : Δ[1]
@@ -1278,7 +1278,7 @@ transpSys ty sys phi u = do
   let max i j = cl primIMax <@> i <@> j
   iz <- primIZero
   tTransp <- primTrans
-  tComp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' builtinComp
+  tComp <- fromMaybe __IMPOSSIBLE__ <$> getTerm' PrimComp
   l_ty <- bind "i" $ \ i -> do
       ty <- absApp <$> ty <*> i
       toLType ty >>= \case

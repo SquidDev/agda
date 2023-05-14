@@ -134,11 +134,11 @@ bindPrimitive b pf = do
 bindBuiltinRewriteRelation :: QName -> TCM ()
 bindBuiltinRewriteRelation x =
   stLocalBuiltins `modifyTCLens`
-    Map.insertWith unionBuiltin (BuiltinName builtinRewrite) (BuiltinRewriteRelations $ singleton x)
+    Map.insertWith unionBuiltin (BuiltinName BuiltinRewrite) (BuiltinRewriteRelations $ singleton x)
 
 -- | Get the currently registered rewrite relation symbols.
 getBuiltinRewriteRelations :: HasBuiltins m => m (Maybe (Set QName))
-getBuiltinRewriteRelations = fmap rels <$> getBuiltinThing (BuiltinName builtinRewrite)
+getBuiltinRewriteRelations = fmap rels <$> getBuiltinThing (BuiltinName BuiltinRewrite)
   where
   rels = \case
     BuiltinRewriteRelations xs -> xs
@@ -197,8 +197,8 @@ getTerm use name = flip fromMaybeM (getTerm' name) $
 -- | Rewrite a literal to constructor form if possible.
 constructorForm :: HasBuiltins m => Term -> m Term
 constructorForm v = do
-  let pZero = fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinZero
-      pSuc  = fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSuc
+  let pZero = fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinZero
+      pSuc  = fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSuc
   constructorForm' pZero pSuc v
 
 constructorForm' :: Applicative m => m Term -> m Term -> Term -> m Term
@@ -283,215 +283,215 @@ primInteger, primIntegerPos, primIntegerNegSuc,
     primAgdaTCMPragmaCompile
     :: (HasBuiltins m, MonadError TCErr m, MonadTCEnv m, ReadTCState m) => m Term
 
-primInteger                           = getBuiltin builtinInteger
-primIntegerPos                        = getBuiltin builtinIntegerPos
-primIntegerNegSuc                     = getBuiltin builtinIntegerNegSuc
-primFloat                             = getBuiltin builtinFloat
-primChar                              = getBuiltin builtinChar
-primString                            = getBuiltin builtinString
-primBool                              = getBuiltin builtinBool
-primSigma                             = getBuiltin builtinSigma
-primUnit                              = getBuiltin builtinUnit
-primUnitUnit                          = getBuiltin builtinUnitUnit
-primTrue                              = getBuiltin builtinTrue
-primFalse                             = getBuiltin builtinFalse
-primList                              = getBuiltin builtinList
-primNil                               = getBuiltin builtinNil
-primCons                              = getBuiltin builtinCons
-primMaybe                             = getBuiltin builtinMaybe
-primNothing                           = getBuiltin builtinNothing
-primJust                              = getBuiltin builtinJust
-primIO                                = getBuiltin builtinIO
-primId                                = getBuiltin builtinId
-primConId                             = getPrimitiveTerm builtinConId
-primIdElim                            = getPrimitiveTerm builtinIdElim
-primPath                              = getBuiltin builtinPath
-primPathP                             = getBuiltin builtinPathP
-primIntervalUniv                      = getBuiltin builtinIntervalUniv
-primInterval                          = getBuiltin builtinInterval
-primIZero                             = getBuiltin builtinIZero
-primIOne                              = getBuiltin builtinIOne
-primIMin                              = getPrimitiveTerm builtinIMin
-primIMax                              = getPrimitiveTerm builtinIMax
-primINeg                              = getPrimitiveTerm builtinINeg
+primInteger                           = getBuiltin BuiltinInteger
+primIntegerPos                        = getBuiltin BuiltinIntegerPos
+primIntegerNegSuc                     = getBuiltin BuiltinIntegerNegSuc
+primFloat                             = getBuiltin BuiltinFloat
+primChar                              = getBuiltin BuiltinChar
+primString                            = getBuiltin BuiltinString
+primBool                              = getBuiltin BuiltinBool
+primSigma                             = getBuiltin BuiltinSigma
+primUnit                              = getBuiltin BuiltinUnit
+primUnitUnit                          = getBuiltin BuiltinUnitUnit
+primTrue                              = getBuiltin BuiltinTrue
+primFalse                             = getBuiltin BuiltinFalse
+primList                              = getBuiltin BuiltinList
+primNil                               = getBuiltin BuiltinNil
+primCons                              = getBuiltin BuiltinCons
+primMaybe                             = getBuiltin BuiltinMaybe
+primNothing                           = getBuiltin BuiltinNothing
+primJust                              = getBuiltin BuiltinJust
+primIO                                = getBuiltin BuiltinIO
+primId                                = getBuiltin BuiltinId
+primConId                             = getPrimitiveTerm PrimConId
+primIdElim                            = getPrimitiveTerm PrimIdElim
+primPath                              = getBuiltin BuiltinPath
+primPathP                             = getBuiltin BuiltinPathP
+primIntervalUniv                      = getBuiltin BuiltinIntervalUniv
+primInterval                          = getBuiltin BuiltinInterval
+primIZero                             = getBuiltin BuiltinIZero
+primIOne                              = getBuiltin BuiltinIOne
+primIMin                              = getPrimitiveTerm PrimIMin
+primIMax                              = getPrimitiveTerm PrimIMax
+primINeg                              = getPrimitiveTerm PrimINeg
 primPartial                           = getPrimitiveTerm PrimPartial
 primPartialP                          = getPrimitiveTerm PrimPartialP
-primIsOne                             = getBuiltin builtinIsOne
-primItIsOne                           = getBuiltin builtinItIsOne
-primTrans                             = getPrimitiveTerm builtinTrans
-primHComp                             = getPrimitiveTerm builtinHComp
-primEquiv                             = getBuiltin builtinEquiv
-primEquivFun                          = getBuiltin builtinEquivFun
-primEquivProof                        = getBuiltin builtinEquivProof
-primTranspProof                       = getBuiltin builtinTranspProof
-prim_glueU                            = getPrimitiveTerm builtin_glueU
-prim_unglueU                          = getPrimitiveTerm builtin_unglueU
-primGlue                              = getPrimitiveTerm builtinGlue
-prim_glue                             = getPrimitiveTerm builtin_glue
-prim_unglue                           = getPrimitiveTerm builtin_unglue
-primFaceForall                        = getPrimitiveTerm builtinFaceForall
-primIsOne1                            = getBuiltin builtinIsOne1
-primIsOne2                            = getBuiltin builtinIsOne2
-primIsOneEmpty                        = getBuiltin builtinIsOneEmpty
-primSub                               = getBuiltin builtinSub
-primSubIn                             = getBuiltin builtinSubIn
-primSubOut                            = getPrimitiveTerm builtinSubOut
-primNat                               = getBuiltin builtinNat
-primSuc                               = getBuiltin builtinSuc
-primZero                              = getBuiltin builtinZero
-primNatPlus                           = getBuiltin builtinNatPlus
-primNatMinus                          = getBuiltin builtinNatMinus
-primNatTimes                          = getBuiltin builtinNatTimes
-primNatDivSucAux                      = getBuiltin builtinNatDivSucAux
-primNatModSucAux                      = getBuiltin builtinNatModSucAux
-primNatEquality                       = getBuiltin builtinNatEquals
-primNatLess                           = getBuiltin builtinNatLess
-primWord64                            = getBuiltin builtinWord64
-primSizeUniv                          = getBuiltin builtinSizeUniv
-primSize                              = getBuiltin builtinSize
-primSizeLt                            = getBuiltin builtinSizeLt
-primSizeSuc                           = getBuiltin builtinSizeSuc
-primSizeInf                           = getBuiltin builtinSizeInf
-primSizeMax                           = getBuiltin builtinSizeMax
-primInf                               = getBuiltin builtinInf
-primSharp                             = getBuiltin builtinSharp
-primFlat                              = getBuiltin builtinFlat
-primEquality                          = getBuiltin builtinEquality
-primRefl                              = getBuiltin builtinRefl
-primLevel                             = getBuiltin builtinLevel
-primLevelZero                         = getBuiltin builtinLevelZero
-primLevelSuc                          = getBuiltin builtinLevelSuc
-primLevelMax                          = getBuiltin builtinLevelMax
-primSet                               = getBuiltin builtinSet
-primProp                              = getBuiltin builtinProp
-primSetOmega                          = getBuiltin builtinSetOmega
-primLockUniv                          = getPrimitiveTerm builtinLockUniv
-primLevelUniv                         = getBuiltin builtinLevelUniv
-primSSetOmega                         = getBuiltin builtinSSetOmega
-primStrictSet                         = getBuiltin builtinStrictSet
-primFromNat                           = getBuiltin builtinFromNat
-primFromNeg                           = getBuiltin builtinFromNeg
-primFromString                        = getBuiltin builtinFromString
-primQName                             = getBuiltin builtinQName
-primArg                               = getBuiltin builtinArg
-primArgArg                            = getBuiltin builtinArgArg
-primAbs                               = getBuiltin builtinAbs
-primAbsAbs                            = getBuiltin builtinAbsAbs
-primAgdaSort                          = getBuiltin builtinAgdaSort
-primHiding                            = getBuiltin builtinHiding
-primHidden                            = getBuiltin builtinHidden
-primInstance                          = getBuiltin builtinInstance
-primVisible                           = getBuiltin builtinVisible
-primRelevance                         = getBuiltin builtinRelevance
-primRelevant                          = getBuiltin builtinRelevant
-primIrrelevant                        = getBuiltin builtinIrrelevant
-primQuantity                          = getBuiltin builtinQuantity
-primQuantity0                         = getBuiltin builtinQuantity0
-primQuantityω                         = getBuiltin builtinQuantityω
-primModality                          = getBuiltin builtinModality
-primModalityConstructor               = getBuiltin builtinModalityConstructor
-primAssoc                             = getBuiltin builtinAssoc
-primAssocLeft                         = getBuiltin builtinAssocLeft
-primAssocRight                        = getBuiltin builtinAssocRight
-primAssocNon                          = getBuiltin builtinAssocNon
-primPrecedence                        = getBuiltin builtinPrecedence
-primPrecRelated                       = getBuiltin builtinPrecRelated
-primPrecUnrelated                     = getBuiltin builtinPrecUnrelated
-primFixity                            = getBuiltin builtinFixity
-primFixityFixity                      = getBuiltin builtinFixityFixity
-primArgInfo                           = getBuiltin builtinArgInfo
-primArgArgInfo                        = getBuiltin builtinArgArgInfo
-primAgdaSortSet                       = getBuiltin builtinAgdaSortSet
-primAgdaSortLit                       = getBuiltin builtinAgdaSortLit
-primAgdaSortProp                      = getBuiltin builtinAgdaSortProp
-primAgdaSortPropLit                   = getBuiltin builtinAgdaSortPropLit
-primAgdaSortInf                       = getBuiltin builtinAgdaSortInf
-primAgdaSortUnsupported               = getBuiltin builtinAgdaSortUnsupported
-primAgdaTerm                          = getBuiltin builtinAgdaTerm
-primAgdaTermVar                       = getBuiltin builtinAgdaTermVar
-primAgdaTermLam                       = getBuiltin builtinAgdaTermLam
-primAgdaTermExtLam                    = getBuiltin builtinAgdaTermExtLam
-primAgdaTermDef                       = getBuiltin builtinAgdaTermDef
-primAgdaTermCon                       = getBuiltin builtinAgdaTermCon
-primAgdaTermPi                        = getBuiltin builtinAgdaTermPi
-primAgdaTermSort                      = getBuiltin builtinAgdaTermSort
-primAgdaTermLit                       = getBuiltin builtinAgdaTermLit
-primAgdaTermUnsupported               = getBuiltin builtinAgdaTermUnsupported
-primAgdaTermMeta                      = getBuiltin builtinAgdaTermMeta
-primAgdaErrorPart                     = getBuiltin builtinAgdaErrorPart
-primAgdaErrorPartString               = getBuiltin builtinAgdaErrorPartString
-primAgdaErrorPartTerm                 = getBuiltin builtinAgdaErrorPartTerm
-primAgdaErrorPartPatt                 = getBuiltin builtinAgdaErrorPartPatt
-primAgdaErrorPartName                 = getBuiltin builtinAgdaErrorPartName
-primAgdaLiteral                       = getBuiltin builtinAgdaLiteral
-primAgdaLitNat                        = getBuiltin builtinAgdaLitNat
-primAgdaLitWord64                     = getBuiltin builtinAgdaLitWord64
-primAgdaLitFloat                      = getBuiltin builtinAgdaLitFloat
-primAgdaLitChar                       = getBuiltin builtinAgdaLitChar
-primAgdaLitString                     = getBuiltin builtinAgdaLitString
-primAgdaLitQName                      = getBuiltin builtinAgdaLitQName
-primAgdaLitMeta                       = getBuiltin builtinAgdaLitMeta
-primAgdaPattern                       = getBuiltin builtinAgdaPattern
-primAgdaPatCon                        = getBuiltin builtinAgdaPatCon
-primAgdaPatVar                        = getBuiltin builtinAgdaPatVar
-primAgdaPatDot                        = getBuiltin builtinAgdaPatDot
-primAgdaPatLit                        = getBuiltin builtinAgdaPatLit
-primAgdaPatProj                       = getBuiltin builtinAgdaPatProj
-primAgdaPatAbsurd                     = getBuiltin builtinAgdaPatAbsurd
-primAgdaClause                        = getBuiltin builtinAgdaClause
-primAgdaClauseClause                  = getBuiltin builtinAgdaClauseClause
-primAgdaClauseAbsurd                  = getBuiltin builtinAgdaClauseAbsurd
-primAgdaDefinitionFunDef              = getBuiltin builtinAgdaDefinitionFunDef
-primAgdaDefinitionDataDef             = getBuiltin builtinAgdaDefinitionDataDef
-primAgdaDefinitionRecordDef           = getBuiltin builtinAgdaDefinitionRecordDef
-primAgdaDefinitionDataConstructor     = getBuiltin builtinAgdaDefinitionDataConstructor
-primAgdaDefinitionPostulate           = getBuiltin builtinAgdaDefinitionPostulate
-primAgdaDefinitionPrimitive           = getBuiltin builtinAgdaDefinitionPrimitive
-primAgdaDefinition                    = getBuiltin builtinAgdaDefinition
-primAgdaMeta                          = getBuiltin builtinAgdaMeta
-primAgdaTCM                           = getBuiltin builtinAgdaTCM
-primAgdaTCMReturn                     = getBuiltin builtinAgdaTCMReturn
-primAgdaTCMBind                       = getBuiltin builtinAgdaTCMBind
-primAgdaTCMUnify                      = getBuiltin builtinAgdaTCMUnify
-primAgdaTCMTypeError                  = getBuiltin builtinAgdaTCMTypeError
-primAgdaTCMInferType                  = getBuiltin builtinAgdaTCMInferType
-primAgdaTCMCheckType                  = getBuiltin builtinAgdaTCMCheckType
-primAgdaTCMNormalise                  = getBuiltin builtinAgdaTCMNormalise
-primAgdaTCMReduce                     = getBuiltin builtinAgdaTCMReduce
-primAgdaTCMCatchError                 = getBuiltin builtinAgdaTCMCatchError
-primAgdaTCMGetContext                 = getBuiltin builtinAgdaTCMGetContext
-primAgdaTCMExtendContext              = getBuiltin builtinAgdaTCMExtendContext
-primAgdaTCMInContext                  = getBuiltin builtinAgdaTCMInContext
-primAgdaTCMFreshName                  = getBuiltin builtinAgdaTCMFreshName
-primAgdaTCMDeclareDef                 = getBuiltin builtinAgdaTCMDeclareDef
-primAgdaTCMDeclarePostulate           = getBuiltin builtinAgdaTCMDeclarePostulate
-primAgdaTCMDeclareData                = getBuiltin builtinAgdaTCMDeclareData
-primAgdaTCMDefineData                 = getBuiltin builtinAgdaTCMDefineData
-primAgdaTCMDefineFun                  = getBuiltin builtinAgdaTCMDefineFun
-primAgdaTCMGetType                    = getBuiltin builtinAgdaTCMGetType
-primAgdaTCMGetDefinition              = getBuiltin builtinAgdaTCMGetDefinition
-primAgdaTCMQuoteTerm                  = getBuiltin builtinAgdaTCMQuoteTerm
-primAgdaTCMQuoteOmegaTerm             = getBuiltin builtinAgdaTCMQuoteOmegaTerm
-primAgdaTCMUnquoteTerm                = getBuiltin builtinAgdaTCMUnquoteTerm
-primAgdaTCMBlockOnMeta                = getBuiltin builtinAgdaTCMBlockOnMeta
-primAgdaTCMCommit                     = getBuiltin builtinAgdaTCMCommit
-primAgdaTCMIsMacro                    = getBuiltin builtinAgdaTCMIsMacro
-primAgdaTCMWithNormalisation          = getBuiltin builtinAgdaTCMWithNormalisation
-primAgdaTCMWithReconstructed          = getBuiltin builtinAgdaTCMWithReconstructed
-primAgdaTCMWithExpandLast             = getBuiltin builtinAgdaTCMWithExpandLast
-primAgdaTCMWithReduceDefs             = getBuiltin builtinAgdaTCMWithReduceDefs
-primAgdaTCMAskNormalisation           = getBuiltin builtinAgdaTCMAskNormalisation
-primAgdaTCMAskReconstructed           = getBuiltin builtinAgdaTCMAskReconstructed
-primAgdaTCMAskExpandLast              = getBuiltin builtinAgdaTCMAskExpandLast
-primAgdaTCMAskReduceDefs              = getBuiltin builtinAgdaTCMAskReduceDefs
-primAgdaTCMFormatErrorParts           = getBuiltin builtinAgdaTCMFormatErrorParts
-primAgdaTCMDebugPrint                 = getBuiltin builtinAgdaTCMDebugPrint
-primAgdaTCMNoConstraints              = getBuiltin builtinAgdaTCMNoConstraints
-primAgdaTCMRunSpeculative             = getBuiltin builtinAgdaTCMRunSpeculative
-primAgdaTCMExec                       = getBuiltin builtinAgdaTCMExec
-primAgdaTCMGetInstances               = getBuiltin builtinAgdaTCMGetInstances
-primAgdaTCMPragmaForeign              = getBuiltin builtinAgdaTCMPragmaForeign
-primAgdaTCMPragmaCompile              = getBuiltin builtinAgdaTCMPragmaCompile
+primIsOne                             = getBuiltin BuiltinIsOne
+primItIsOne                           = getBuiltin BuiltinItIsOne
+primTrans                             = getPrimitiveTerm PrimTrans
+primHComp                             = getPrimitiveTerm PrimHComp
+primEquiv                             = getBuiltin BuiltinEquiv
+primEquivFun                          = getBuiltin BuiltinEquivFun
+primEquivProof                        = getBuiltin BuiltinEquivProof
+primTranspProof                       = getBuiltin BuiltinTranspProof
+prim_glueU                            = getPrimitiveTerm Prim_glueU
+prim_unglueU                          = getPrimitiveTerm Prim_unglueU
+primGlue                              = getPrimitiveTerm PrimGlue
+prim_glue                             = getPrimitiveTerm Prim_glue
+prim_unglue                           = getPrimitiveTerm Prim_unglue
+primFaceForall                        = getPrimitiveTerm PrimFaceForall
+primIsOne1                            = getBuiltin BuiltinIsOne1
+primIsOne2                            = getBuiltin BuiltinIsOne2
+primIsOneEmpty                        = getBuiltin BuiltinIsOneEmpty
+primSub                               = getBuiltin BuiltinSub
+primSubIn                             = getBuiltin BuiltinSubIn
+primSubOut                            = getPrimitiveTerm PrimSubOut
+primNat                               = getBuiltin BuiltinNat
+primSuc                               = getBuiltin BuiltinSuc
+primZero                              = getBuiltin BuiltinZero
+primNatPlus                           = getBuiltin BuiltinNatPlus
+primNatMinus                          = getBuiltin BuiltinNatMinus
+primNatTimes                          = getBuiltin BuiltinNatTimes
+primNatDivSucAux                      = getBuiltin BuiltinNatDivSucAux
+primNatModSucAux                      = getBuiltin BuiltinNatModSucAux
+primNatEquality                       = getBuiltin BuiltinNatEquals
+primNatLess                           = getBuiltin BuiltinNatLess
+primWord64                            = getBuiltin BuiltinWord64
+primSizeUniv                          = getBuiltin BuiltinSizeUniv
+primSize                              = getBuiltin BuiltinSize
+primSizeLt                            = getBuiltin BuiltinSizeLt
+primSizeSuc                           = getBuiltin BuiltinSizeSuc
+primSizeInf                           = getBuiltin BuiltinSizeInf
+primSizeMax                           = getBuiltin BuiltinSizeMax
+primInf                               = getBuiltin BuiltinInf
+primSharp                             = getBuiltin BuiltinSharp
+primFlat                              = getBuiltin BuiltinFlat
+primEquality                          = getBuiltin BuiltinEquality
+primRefl                              = getBuiltin BuiltinRefl
+primLevel                             = getBuiltin BuiltinLevel
+primLevelZero                         = getBuiltin BuiltinLevelZero
+primLevelSuc                          = getBuiltin BuiltinLevelSuc
+primLevelMax                          = getBuiltin BuiltinLevelMax
+primSet                               = getBuiltin BuiltinSet
+primProp                              = getBuiltin BuiltinProp
+primSetOmega                          = getBuiltin BuiltinSetOmega
+primLockUniv                          = getPrimitiveTerm PrimLockUniv
+primLevelUniv                         = getBuiltin BuiltinLevelUniv
+primSSetOmega                         = getBuiltin BuiltinSSetOmega
+primStrictSet                         = getBuiltin BuiltinStrictSet
+primFromNat                           = getBuiltin BuiltinFromNat
+primFromNeg                           = getBuiltin BuiltinFromNeg
+primFromString                        = getBuiltin BuiltinFromString
+primQName                             = getBuiltin BuiltinQName
+primArg                               = getBuiltin BuiltinArg
+primArgArg                            = getBuiltin BuiltinArgArg
+primAbs                               = getBuiltin BuiltinAbs
+primAbsAbs                            = getBuiltin BuiltinAbsAbs
+primAgdaSort                          = getBuiltin BuiltinAgdaSort
+primHiding                            = getBuiltin BuiltinHiding
+primHidden                            = getBuiltin BuiltinHidden
+primInstance                          = getBuiltin BuiltinInstance
+primVisible                           = getBuiltin BuiltinVisible
+primRelevance                         = getBuiltin BuiltinRelevance
+primRelevant                          = getBuiltin BuiltinRelevant
+primIrrelevant                        = getBuiltin BuiltinIrrelevant
+primQuantity                          = getBuiltin BuiltinQuantity
+primQuantity0                         = getBuiltin BuiltinQuantity0
+primQuantityω                         = getBuiltin BuiltinQuantityω
+primModality                          = getBuiltin BuiltinModality
+primModalityConstructor               = getBuiltin BuiltinModalityConstructor
+primAssoc                             = getBuiltin BuiltinAssoc
+primAssocLeft                         = getBuiltin BuiltinAssocLeft
+primAssocRight                        = getBuiltin BuiltinAssocRight
+primAssocNon                          = getBuiltin BuiltinAssocNon
+primPrecedence                        = getBuiltin BuiltinPrecedence
+primPrecRelated                       = getBuiltin BuiltinPrecRelated
+primPrecUnrelated                     = getBuiltin BuiltinPrecUnrelated
+primFixity                            = getBuiltin BuiltinFixity
+primFixityFixity                      = getBuiltin BuiltinFixityFixity
+primArgInfo                           = getBuiltin BuiltinArgInfo
+primArgArgInfo                        = getBuiltin BuiltinArgArgInfo
+primAgdaSortSet                       = getBuiltin BuiltinAgdaSortSet
+primAgdaSortLit                       = getBuiltin BuiltinAgdaSortLit
+primAgdaSortProp                      = getBuiltin BuiltinAgdaSortProp
+primAgdaSortPropLit                   = getBuiltin BuiltinAgdaSortPropLit
+primAgdaSortInf                       = getBuiltin BuiltinAgdaSortInf
+primAgdaSortUnsupported               = getBuiltin BuiltinAgdaSortUnsupported
+primAgdaTerm                          = getBuiltin BuiltinAgdaTerm
+primAgdaTermVar                       = getBuiltin BuiltinAgdaTermVar
+primAgdaTermLam                       = getBuiltin BuiltinAgdaTermLam
+primAgdaTermExtLam                    = getBuiltin BuiltinAgdaTermExtLam
+primAgdaTermDef                       = getBuiltin BuiltinAgdaTermDef
+primAgdaTermCon                       = getBuiltin BuiltinAgdaTermCon
+primAgdaTermPi                        = getBuiltin BuiltinAgdaTermPi
+primAgdaTermSort                      = getBuiltin BuiltinAgdaTermSort
+primAgdaTermLit                       = getBuiltin BuiltinAgdaTermLit
+primAgdaTermUnsupported               = getBuiltin BuiltinAgdaTermUnsupported
+primAgdaTermMeta                      = getBuiltin BuiltinAgdaTermMeta
+primAgdaErrorPart                     = getBuiltin BuiltinAgdaErrorPart
+primAgdaErrorPartString               = getBuiltin BuiltinAgdaErrorPartString
+primAgdaErrorPartTerm                 = getBuiltin BuiltinAgdaErrorPartTerm
+primAgdaErrorPartPatt                 = getBuiltin BuiltinAgdaErrorPartPatt
+primAgdaErrorPartName                 = getBuiltin BuiltinAgdaErrorPartName
+primAgdaLiteral                       = getBuiltin BuiltinAgdaLiteral
+primAgdaLitNat                        = getBuiltin BuiltinAgdaLitNat
+primAgdaLitWord64                     = getBuiltin BuiltinAgdaLitWord64
+primAgdaLitFloat                      = getBuiltin BuiltinAgdaLitFloat
+primAgdaLitChar                       = getBuiltin BuiltinAgdaLitChar
+primAgdaLitString                     = getBuiltin BuiltinAgdaLitString
+primAgdaLitQName                      = getBuiltin BuiltinAgdaLitQName
+primAgdaLitMeta                       = getBuiltin BuiltinAgdaLitMeta
+primAgdaPattern                       = getBuiltin BuiltinAgdaPattern
+primAgdaPatCon                        = getBuiltin BuiltinAgdaPatCon
+primAgdaPatVar                        = getBuiltin BuiltinAgdaPatVar
+primAgdaPatDot                        = getBuiltin BuiltinAgdaPatDot
+primAgdaPatLit                        = getBuiltin BuiltinAgdaPatLit
+primAgdaPatProj                       = getBuiltin BuiltinAgdaPatProj
+primAgdaPatAbsurd                     = getBuiltin BuiltinAgdaPatAbsurd
+primAgdaClause                        = getBuiltin BuiltinAgdaClause
+primAgdaClauseClause                  = getBuiltin BuiltinAgdaClauseClause
+primAgdaClauseAbsurd                  = getBuiltin BuiltinAgdaClauseAbsurd
+primAgdaDefinitionFunDef              = getBuiltin BuiltinAgdaDefinitionFunDef
+primAgdaDefinitionDataDef             = getBuiltin BuiltinAgdaDefinitionDataDef
+primAgdaDefinitionRecordDef           = getBuiltin BuiltinAgdaDefinitionRecordDef
+primAgdaDefinitionDataConstructor     = getBuiltin BuiltinAgdaDefinitionDataConstructor
+primAgdaDefinitionPostulate           = getBuiltin BuiltinAgdaDefinitionPostulate
+primAgdaDefinitionPrimitive           = getBuiltin BuiltinAgdaDefinitionPrimitive
+primAgdaDefinition                    = getBuiltin BuiltinAgdaDefinition
+primAgdaMeta                          = getBuiltin BuiltinAgdaMeta
+primAgdaTCM                           = getBuiltin BuiltinAgdaTCM
+primAgdaTCMReturn                     = getBuiltin BuiltinAgdaTCMReturn
+primAgdaTCMBind                       = getBuiltin BuiltinAgdaTCMBind
+primAgdaTCMUnify                      = getBuiltin BuiltinAgdaTCMUnify
+primAgdaTCMTypeError                  = getBuiltin BuiltinAgdaTCMTypeError
+primAgdaTCMInferType                  = getBuiltin BuiltinAgdaTCMInferType
+primAgdaTCMCheckType                  = getBuiltin BuiltinAgdaTCMCheckType
+primAgdaTCMNormalise                  = getBuiltin BuiltinAgdaTCMNormalise
+primAgdaTCMReduce                     = getBuiltin BuiltinAgdaTCMReduce
+primAgdaTCMCatchError                 = getBuiltin BuiltinAgdaTCMCatchError
+primAgdaTCMGetContext                 = getBuiltin BuiltinAgdaTCMGetContext
+primAgdaTCMExtendContext              = getBuiltin BuiltinAgdaTCMExtendContext
+primAgdaTCMInContext                  = getBuiltin BuiltinAgdaTCMInContext
+primAgdaTCMFreshName                  = getBuiltin BuiltinAgdaTCMFreshName
+primAgdaTCMDeclareDef                 = getBuiltin BuiltinAgdaTCMDeclareDef
+primAgdaTCMDeclarePostulate           = getBuiltin BuiltinAgdaTCMDeclarePostulate
+primAgdaTCMDeclareData                = getBuiltin BuiltinAgdaTCMDeclareData
+primAgdaTCMDefineData                 = getBuiltin BuiltinAgdaTCMDefineData
+primAgdaTCMDefineFun                  = getBuiltin BuiltinAgdaTCMDefineFun
+primAgdaTCMGetType                    = getBuiltin BuiltinAgdaTCMGetType
+primAgdaTCMGetDefinition              = getBuiltin BuiltinAgdaTCMGetDefinition
+primAgdaTCMQuoteTerm                  = getBuiltin BuiltinAgdaTCMQuoteTerm
+primAgdaTCMQuoteOmegaTerm             = getBuiltin BuiltinAgdaTCMQuoteOmegaTerm
+primAgdaTCMUnquoteTerm                = getBuiltin BuiltinAgdaTCMUnquoteTerm
+primAgdaTCMBlockOnMeta                = getBuiltin BuiltinAgdaTCMBlockOnMeta
+primAgdaTCMCommit                     = getBuiltin BuiltinAgdaTCMCommit
+primAgdaTCMIsMacro                    = getBuiltin BuiltinAgdaTCMIsMacro
+primAgdaTCMWithNormalisation          = getBuiltin BuiltinAgdaTCMWithNormalisation
+primAgdaTCMWithReconstructed          = getBuiltin BuiltinAgdaTCMWithReconstructed
+primAgdaTCMWithExpandLast             = getBuiltin BuiltinAgdaTCMWithExpandLast
+primAgdaTCMWithReduceDefs             = getBuiltin BuiltinAgdaTCMWithReduceDefs
+primAgdaTCMAskNormalisation           = getBuiltin BuiltinAgdaTCMAskNormalisation
+primAgdaTCMAskReconstructed           = getBuiltin BuiltinAgdaTCMAskReconstructed
+primAgdaTCMAskExpandLast              = getBuiltin BuiltinAgdaTCMAskExpandLast
+primAgdaTCMAskReduceDefs              = getBuiltin BuiltinAgdaTCMAskReduceDefs
+primAgdaTCMFormatErrorParts           = getBuiltin BuiltinAgdaTCMFormatErrorParts
+primAgdaTCMDebugPrint                 = getBuiltin BuiltinAgdaTCMDebugPrint
+primAgdaTCMNoConstraints              = getBuiltin BuiltinAgdaTCMNoConstraints
+primAgdaTCMRunSpeculative             = getBuiltin BuiltinAgdaTCMRunSpeculative
+primAgdaTCMExec                       = getBuiltin BuiltinAgdaTCMExec
+primAgdaTCMGetInstances               = getBuiltin BuiltinAgdaTCMGetInstances
+primAgdaTCMPragmaForeign              = getBuiltin BuiltinAgdaTCMPragmaForeign
+primAgdaTCMPragmaCompile              = getBuiltin BuiltinAgdaTCMPragmaCompile
 
 -- | The coinductive primitives.
 
@@ -533,11 +533,11 @@ data SortKit = SortKit
 -- we report a type error rather than exploding.
 sortKit :: (HasBuiltins m, MonadTCError m, HasOptions m) => m SortKit
 sortKit = do
-  Def set      _  <- getBuiltin builtinSet
-  Def prop     _  <- getBuiltin builtinProp
-  Def setomega _  <- getBuiltin builtinSetOmega
-  Def sset     _  <- getBuiltin builtinStrictSet
-  Def ssetomega _ <- getBuiltin builtinSSetOmega
+  Def set      _  <- getBuiltin BuiltinSet
+  Def prop     _  <- getBuiltin BuiltinProp
+  Def setomega _  <- getBuiltin BuiltinSetOmega
+  Def sset     _  <- getBuiltin BuiltinStrictSet
+  Def ssetomega _ <- getBuiltin BuiltinSSetOmega
   return $ SortKit
     { nameOfSet      = set
     , nameOfProp     = prop
@@ -553,11 +553,11 @@ sortKit = do
 -- checking.
 infallibleSortKit :: HasBuiltins m => m SortKit
 infallibleSortKit = do
-  Def set      _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSet
-  Def prop     _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinProp
-  Def setomega _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSetOmega
-  Def sset     _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinStrictSet
-  Def ssetomega _ <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinSSetOmega
+  Def set      _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSet
+  Def prop     _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinProp
+  Def setomega _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSetOmega
+  Def sset     _  <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinStrictSet
+  Def ssetomega _ <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinSSetOmega
   return $ SortKit
     { nameOfSet      = set
     , nameOfProp     = prop
@@ -596,11 +596,11 @@ intervalSort = IntervalUniv
 
 intervalView' :: HasBuiltins m => m (Term -> IntervalView)
 intervalView' = do
-  iz <- getBuiltinName' builtinIZero
-  io <- getBuiltinName' builtinIOne
-  imax <- getPrimitiveName' builtinIMax
-  imin <- getPrimitiveName' builtinIMin
-  ineg <- getPrimitiveName' builtinINeg
+  iz <- getBuiltinName' BuiltinIZero
+  io <- getBuiltinName' BuiltinIOne
+  imax <- getPrimitiveName' PrimIMax
+  imin <- getPrimitiveName' PrimIMin
+  ineg <- getPrimitiveName' PrimINeg
   return $ \ t ->
     case t of
       Def q es ->
@@ -625,11 +625,11 @@ intervalUnview t = do
 
 intervalUnview' :: HasBuiltins m => m (IntervalView -> Term)
 intervalUnview' = do
-  iz <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinIZero -- should it be a type error instead?
-  io <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' builtinIOne
-  imin <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' builtinIMin
-  imax <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' builtinIMax
-  ineg <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' builtinINeg
+  iz <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinIZero -- should it be a type error instead?
+  io <- fromMaybe __IMPOSSIBLE__ <$> getBuiltin' BuiltinIOne
+  imin <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' PrimIMin
+  imax <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' PrimIMax
+  ineg <- (`Def` []) . fromMaybe __IMPOSSIBLE__ <$> getPrimitiveName' PrimINeg
   return $ \ v -> case v of
              IZero -> iz
              IOne  -> io
@@ -654,8 +654,8 @@ pathView t0 = do
 
 pathView' :: HasBuiltins m => m (Type -> PathView)
 pathView' = do
- mpath  <- getBuiltinName' builtinPath
- mpathp <- getBuiltinName' builtinPathP
+ mpath  <- getBuiltinName' BuiltinPath
+ mpathp <- getBuiltinName' BuiltinPathP
  return $ \ t0@(El s t) ->
   case t of
     Def path' [ Apply level , Apply typ , Apply lhs , Apply rhs ]
@@ -668,8 +668,8 @@ pathView' = do
 -- | Non dependent Path
 idViewAsPath :: HasBuiltins m => Type -> m PathView
 idViewAsPath t0@(El s t) = do
-  mid <- fmap getPrimName <$> getBuiltin' builtinId
-  mpath <- fmap getPrimName <$> getBuiltin' builtinPath
+  mid <- fmap getPrimName <$> getBuiltin' BuiltinId
+  mpath <- fmap getPrimName <$> getBuiltin' BuiltinPath
   case mid of
    Just path | isJust mpath -> case t of
     Def path' [ Apply level , Apply typ , Apply lhs , Apply rhs ]
@@ -700,8 +700,8 @@ pathUnview (PathType s path l t lhs rhs) =
 -- f x (< phi , p > : Id A x _) = Just (phi,p)
 conidView' :: HasBuiltins m => m (Term -> Term -> Maybe (Arg Term,Arg Term))
 conidView' = do
-  mn <- sequence <$> mapM getName' [someBuiltin builtinReflId, someBuiltin builtinConId]
-  mio <- getTerm' builtinIOne
+  mn <- sequence <$> mapM getName' [someBuiltin BuiltinReflId, someBuiltin PrimConId]
+  mio <- getTerm' BuiltinIOne
   let fallback = return $ \ _ _ -> Nothing
   caseMaybe mn fallback $ \ [refl,conid] ->
    caseMaybe mio fallback $ \ io -> return $ \ x t ->
@@ -770,13 +770,13 @@ instance EqualityUnview EqualityTypeData where
 -- | Primitives with typechecking constrants.
 constrainedPrims :: [PrimitiveId]
 constrainedPrims =
-  [ builtinConId
-  , builtinPOr
-  , builtinComp
-  , builtinHComp
-  , builtinTrans
-  , builtin_glue
-  , builtin_glueU
+  [ PrimConId
+  , PrimPOr
+  , PrimComp
+  , PrimHComp
+  , PrimTrans
+  , Prim_glue
+  , Prim_glueU
   ]
 
 getNameOfConstrained :: HasBuiltins m => PrimitiveId -> m (Maybe QName)

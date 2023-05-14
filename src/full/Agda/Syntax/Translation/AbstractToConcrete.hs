@@ -109,7 +109,7 @@ data Env = Env { takenVarNames :: Set A.Name
 makeEnv :: MonadAbsToCon m => ScopeInfo -> m Env
 makeEnv scope = do
       -- zero and suc doesn't have to be in scope for natural number literals to work
-  let noScopeCheck b = b `elem` [builtinZero, builtinSuc]
+  let noScopeCheck b = b `elem` [BuiltinZero, BuiltinSuc]
       name (I.Def q _)   = Just q
       name (I.Con q _ _) = Just (I.conName q)
       name _             = Nothing
@@ -126,7 +126,7 @@ makeEnv scope = do
   forM_ (scope ^. scopeLocals) $ \(y , x) -> do
     pickConcreteName (localVar x) y
 
-  builtinList <- concat <$> mapM builtin [ builtinFromNat, builtinFromString, builtinFromNeg, builtinZero, builtinSuc ]
+  builtinList <- concat <$> mapM builtin [ BuiltinFromNat, BuiltinFromString, BuiltinFromNeg, BuiltinZero, BuiltinSuc ]
   foldPatSyns <- optPrintPatternSynonyms <$> pragmaOptions
   return $
     Env { takenVarNames = Set.fromList vars
@@ -800,10 +800,10 @@ instance ToConcrete A.Expr where
       -- inserted by the system.
       case (getHead e1, namedArg e2) of
         (Just (HdDef q), l@A.Lit{})
-          | any (is q) [builtinFromNat, builtinFromString], visible e2,
+          | any (is q) [BuiltinFromNat, BuiltinFromString], visible e2,
             getOrigin i == Inserted -> toConcrete l
         (Just (HdDef q), A.Lit r (LitNat n))
-          | q `is` builtinFromNeg, visible e2,
+          | q `is` BuiltinFromNeg, visible e2,
             getOrigin i == Inserted -> toConcrete (A.Lit r (LitNat (-n)))
         _ ->
           tryToRecoverPatternSyn e
@@ -1578,7 +1578,7 @@ tryToRecoverNatural e def = do
   caseMaybe (recoverNatural is e) def $ return . C.Lit noRange . LitNat
 
 recoverNatural :: (A.QName -> BuiltinId -> Bool) -> A.Expr -> Maybe Integer
-recoverNatural is e = explore (`is` builtinZero) (`is` builtinSuc) 0 e
+recoverNatural is e = explore (`is` BuiltinZero) (`is` BuiltinSuc) 0 e
   where
     explore :: (A.QName -> Bool) -> (A.QName -> Bool) -> Integer -> A.Expr -> Maybe Integer
     explore isZero isSuc k (A.App _ (A.Con c) t) | Just f <- getUnambiguous c, isSuc f

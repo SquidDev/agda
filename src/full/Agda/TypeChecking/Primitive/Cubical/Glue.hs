@@ -60,14 +60,14 @@ mkGComp :: forall m. HasBuiltins m
 mkGComp s = do
   let getTermLocal :: IsBuiltin a => a -> NamesT m Term
       getTermLocal = getTerm s
-  tPOr <- getTermLocal builtinPOr
-  tIMax <- getTermLocal builtinIMax
-  tIMin <- getTermLocal builtinIMin
-  tINeg <- getTermLocal builtinINeg
-  tHComp <- getTermLocal builtinHComp
-  tTrans <- getTermLocal builtinTrans
-  io      <- getTermLocal builtinIOne
-  iz      <- getTermLocal builtinIZero
+  tPOr <- getTermLocal PrimPOr
+  tIMax <- getTermLocal PrimIMax
+  tIMin <- getTermLocal PrimIMin
+  tINeg <- getTermLocal PrimINeg
+  tHComp <- getTermLocal PrimHComp
+  tTrans <- getTermLocal PrimTrans
+  io      <- getTermLocal BuiltinIOne
+  iz      <- getTermLocal BuiltinIZero
   let forward la bA r u = pure tTrans <#> lam "i" (\ i -> la <@> (i `imax` r))
                                       <@> lam "i" (\ i -> bA <@> (i `imax` r))
                                       <@> r
@@ -102,13 +102,13 @@ doGlueKanOp (HCompOp psi u u0) (IsNot (la, lb, bA, phi, bT, e)) tpos = do
 -- ... |- bT : Partial φ (Type lB)
 -- ... |- e : PartialP φ λ o → bT o ≃ bA
   let getTermLocal :: IsBuiltin a => a -> m Term
-      getTermLocal = getTerm $ getBuiltinId builtinHComp ++ " for " ++ getBuiltinId builtinGlue
-  tHComp   <- getTermLocal builtinHComp
-  tEFun    <- getTermLocal builtinEquivFun
-  tglue    <- getTermLocal builtin_glue
-  tunglue  <- getTermLocal builtin_unglue
-  io       <- getTermLocal builtinIOne
-  tItIsOne <- getTermLocal builtinItIsOne
+      getTermLocal = getTerm $ getBuiltinId PrimHComp ++ " for " ++ getBuiltinId PrimGlue
+  tHComp   <- getTermLocal PrimHComp
+  tEFun    <- getTermLocal BuiltinEquivFun
+  tglue    <- getTermLocal Prim_glue
+  tunglue  <- getTermLocal Prim_unglue
+  io       <- getTermLocal BuiltinIOne
+  tItIsOne <- getTermLocal BuiltinItIsOne
   view     <- intervalView'
 
   runNamesT [] $ do
@@ -138,22 +138,22 @@ doGlueKanOp (HCompOp psi u u0) (IsNot (la, lb, bA, phi, bT, e)) tpos = do
 doGlueKanOp (TranspOp psi u0) (IsFam (la, lb, bA, phi, bT, e)) tpos = do
 -- transp (λ i → Glue {la} {lb} bA {φ} (bT , e)) ψ u0
   let
-    localUse = getBuiltinId builtinTrans ++ " for " ++ getBuiltinId builtinGlue
+    localUse = getBuiltinId PrimTrans ++ " for " ++ getBuiltinId PrimGlue
     getTermLocal :: IsBuiltin a => a -> m Term
     getTermLocal = getTerm localUse
-  tHComp <- getTermLocal builtinHComp
-  tTrans <- getTermLocal builtinTrans
-  tForall <- getTermLocal builtinFaceForall
-  tEFun   <- getTermLocal builtinEquivFun
-  tEProof <- getTermLocal builtinEquivProof
-  toutS   <- getTermLocal builtinSubOut
-  tglue   <- getTermLocal builtin_glue
-  tunglue <- getTermLocal builtin_unglue
-  io      <- getTermLocal builtinIOne
-  iz      <- getTermLocal builtinIZero
-  tLMax   <- getTermLocal builtinLevelMax
-  tTransp <- getTermLocal builtinTranspProof
-  tItIsOne <- getTermLocal builtinItIsOne
+  tHComp <- getTermLocal PrimHComp
+  tTrans <- getTermLocal PrimTrans
+  tForall <- getTermLocal PrimFaceForall
+  tEFun   <- getTermLocal BuiltinEquivFun
+  tEProof <- getTermLocal BuiltinEquivProof
+  toutS   <- getTermLocal PrimSubOut
+  tglue   <- getTermLocal Prim_glue
+  tunglue <- getTermLocal Prim_unglue
+  io      <- getTermLocal BuiltinIOne
+  iz      <- getTermLocal BuiltinIZero
+  tLMax   <- getTermLocal BuiltinLevelMax
+  tTransp <- getTermLocal BuiltinTranspProof
+  tItIsOne <- getTermLocal BuiltinItIsOne
   kit <- fromMaybe __IMPOSSIBLE__ <$> getSigmaKit
   runNamesT [] $ do
 
@@ -344,10 +344,10 @@ prim_unglue' = do
   -- Glue φ A (T, e) = T@ so this is well-typed.
   view <- intervalView'
   one <- primItIsOne
-  mGlue <- getPrimitiveName' builtinGlue
-  mglue <- getPrimitiveName' builtin_glue
-  mtransp <- getPrimitiveName' builtinTrans
-  mhcomp <- getPrimitiveName' builtinHComp
+  mGlue <- getPrimitiveName' PrimGlue
+  mglue <- getPrimitiveName' Prim_glue
+  mtransp <- getPrimitiveName' PrimTrans
+  mhcomp <- getPrimitiveName' PrimHComp
   return $ PrimImpl t $ primFun __IMPOSSIBLE__ 7 $ \case
     [la, lb, bA, phi, bT, e, b] -> do
       sphi <- reduceB' phi
@@ -357,7 +357,7 @@ prim_unglue' = do
         -- just @e b@!
         IOne -> do
           let argOne = setRelevance Irrelevant $ argN one
-          tEFun <- getTerm (getBuiltinId builtin_unglue) builtinEquivFun
+          tEFun <- getTerm (getBuiltinId Prim_unglue) BuiltinEquivFun
           redReturn $ tEFun `apply` [lb,la,argH $ unArg bT `apply` [argOne],bA, argN $ unArg e `apply` [argOne],b]
 
         -- Otherwise we're dealing with a proper glued thing.
