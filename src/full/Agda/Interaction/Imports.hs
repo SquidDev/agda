@@ -927,13 +927,13 @@ writeInterface file i = let fp = filePath file in do
     let filteredIface = i { iInsideScope  = withoutPrivates $ iInsideScope i }
     reportSLn "import.iface.write" 50 $
       "Writing interface file with hash " ++ show (iFullHash filteredIface) ++ "."
-    encodedIface <- encodeFile fp filteredIface
-    reportSLn "import.iface.write" 5 "Wrote interface file."
-#if __GLASGOW_HASKELL__ >= 804
-    fromMaybe __IMPOSSIBLE__ <$> (Bench.billTo [Bench.Deserialization] (decode encodedIface))
-#else
+--     encodedIface <- encodeFile fp filteredIface
+--     reportSLn "import.iface.write" 5 "Wrote interface file."
+-- #if __GLASGOW_HASKELL__ >= 804
+--     fromMaybe __IMPOSSIBLE__ <$> (Bench.billTo [Bench.Deserialization] (decode encodedIface))
+-- #else
     return filteredIface
-#endif
+-- #endif
   `catchError` \e -> do
     reportSLn "" 1 $
       "Failed to write interface " ++ fp ++ "."
