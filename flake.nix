@@ -2,8 +2,9 @@
   description = "Agda is a dependently typed programming language / interactive theorem prover.";
 
   inputs.flake-utils.url = "github:numtide/flake-utils";
+  inputs.ghc-wasm.url = "git+https://gitlab.haskell.org/ghc/ghc-wasm-meta.git";
 
-  outputs = { self, nixpkgs, flake-utils }: (flake-utils.lib.eachDefaultSystem (system: let
+  outputs = { self, nixpkgs, flake-utils, ghc-wasm }: (flake-utils.lib.eachDefaultSystem (system: let
     pkgs = import nixpkgs { inherit system; overlays = [ self.overlay ]; };
   in {
     packages = {
@@ -20,6 +21,7 @@
         cabal-install
         haskell-language-server
         haskellPackages.fix-whitespace
+        ghc-wasm.packages."${system}".default
 
         # documentation
         (python3.withPackages (ps: with ps; [

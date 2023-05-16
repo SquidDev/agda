@@ -6,7 +6,6 @@
 
 module Agda.Utils.Time
   ( ClockTime
-  , getClockTime
   , getCPUTime
   , measureTime
   , CPUTime(..)
@@ -26,11 +25,6 @@ import Agda.Utils.String
 -- | Timestamps.
 
 type ClockTime = Data.Time.UTCTime
-
--- | The current time.
-
-getClockTime :: IO ClockTime
-getClockTime = Data.Time.getCurrentTime
 
 -- | CPU time in pico (10^-12) seconds.
 

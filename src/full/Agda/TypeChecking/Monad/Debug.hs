@@ -18,9 +18,6 @@ import Control.Monad.Trans.Identity
 import Control.Monad.Writer
 
 import Data.Maybe
-import Data.Time                    ( getCurrentTime, getCurrentTimeZone, utcToLocalTime )
-import Data.Time.Format.ISO8601.Compat ( iso8601Show )
-  -- This is also exported from Data.Time.Format.ISO8601, but only from time >= 1.9
 
 import {-# SOURCE #-} Agda.TypeChecking.Errors
 import Agda.TypeChecking.Monad.Base
@@ -140,12 +137,7 @@ instance MonadDebug TCM where
     s  <- liftIO . catchAndPrintImpossible k n . E.evaluate . DeepSeq.force $ s
     cb <- getsTC $ stInteractionOutputCallback . stPersistentState
 
-    -- Andreas, 2022-06-15, prefix with time stamp if `-v debug.time:100`:
-    msg <- ifNotM (hasVerbosity "debug.time" 100) {-then-} (return s) {-else-} $ do
-      now <- liftIO $ trailingZeros . iso8601Show <$> liftA2 utcToLocalTime getCurrentTimeZone getCurrentTime
-      return $ concat [ now, ": ", s ]
-
-    cb $ Resp_RunningInfo n msg
+    cb $ Resp_RunningInfo n s
     cont
     where
     -- Surprisingly, iso8601Show gives us _up to_ 6 fractional digits (microseconds),

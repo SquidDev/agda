@@ -759,4 +759,12 @@ debug : ## Print debug information.
 	@echo "Run \`make -pq\` to get a detailed report."
 	@echo
 
+.PHONY : wasm
+wasm :
+	wasm32-wasi-cabal build -- agda
+# wizer --allow-wasi --wasm-bulk-memory true ./dist-newstyle/build/wasm32-wasi/ghc-9.7.20230425/Agda-2.6.4/x/agda/build/agda/agda.wasm \
+#		-o agda.wizer.wasm --mapdir /::./tmp
+	cp ./dist-newstyle/build/wasm32-wasi/ghc-9.7.20230425/Agda-2.6.4/x/agda/build/agda/agda.wasm agda.wizer.wasm
+	wasm-opt -O1 agda.wizer.wasm -o agda.opt.wasm
+	cp agda.opt.wasm src/web/dist/agda.wasm
 # EOF

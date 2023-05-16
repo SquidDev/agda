@@ -55,9 +55,6 @@ import Data.Function (on)
 import Data.Semigroup((<>))
 #endif
 
-import qualified Codec.Compression.GZip as G
-import qualified Codec.Compression.Zlib.Internal as Z
-
 #if __GLASGOW_HASKELL__ >= 804
 import GHC.Compact as C
 #endif
@@ -134,13 +131,7 @@ encode a = do
     -- Encode hashmaps and root, and compress.
     bits1 <- Bench.billTo [ Bench.Serialization, Bench.BinaryEncode ] $
       return $!! B.encode (root, nL, ltL, stL, bL, iL, dL)
-    let compressParams = G.defaultCompressParams
-          { G.compressLevel    = G.bestSpeed
-          , G.compressStrategy = G.huffmanOnlyStrategy
-          }
-    cbits <- Bench.billTo [ Bench.Serialization, Bench.Compress ] $
-      return $!! G.compressWith compressParams bits1
-    let x = B.encode currentInterfaceVersion <> cbits
+    let x = B.encode currentInterfaceVersion <> bits1
     return (Encoded { uncompressed = bits1, compressed = x })
   where
     l h = List.map fst . List.sortBy (compare `on` snd) <$> H.toList h
@@ -288,16 +279,7 @@ decodeInterface s = do
        let (ver, s', _) = runGetState B.get (L.drop 16 s) 0 in
        if ver /= currentInterfaceVersion
        then Left "Wrong interface version."
-       else Right $
-            toLazyByteString $
-            Z.foldDecompressStreamWithInput
-              (\s -> (byteString s <>))
-              (\s -> if null s
-                     then mempty
-                     else error "Garbage at end.")
-              (\err -> error (show err))
-              (Z.decompressST Z.gzipFormat Z.defaultDecompressParams)
-              s'
+       else Right s'
 
   case s of
     Right s  -> decode s

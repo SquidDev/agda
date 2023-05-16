@@ -128,7 +128,7 @@ mkLibM libs m = do
 getAgdaAppDir :: IO FilePath
 getAgdaAppDir = do
   -- System-specific command to build the path to ~/.agda (Unix) or %APPDATA%\agda (Win)
-  let agdaDir = getAppUserDataDirectory "agda"
+  let agdaDir = pure "/agda"
   -- The default can be overwritten by setting the AGDA_DIR environment variable
   caseMaybeM (lookupEnv "AGDA_DIR") agdaDir $ \ dir ->
       ifM (doesDirectoryExist dir) (canonicalizePath dir) $ do
@@ -227,8 +227,8 @@ findProjectConfig' root = do
     --   operating systems L/.. refers to R.
     upPath :: FilePath -> IO (Maybe FilePath)
     upPath root = do
-      up <- canonicalizePath $ root </> ".."
-      if up == root then return Nothing else return $ Just up
+      pure Nothing -- up <- canonicalizePath $ root </> ".."
+      -- if up == root then return Nothing else return $ Just up
 
 
 -- | Get project root
