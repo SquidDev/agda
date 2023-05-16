@@ -1,4 +1,5 @@
 import { promises as fs } from "fs";
+import path from "path";
 
 import resolve from "@rollup/plugin-node-resolve";
 import typescript from "@rollup/plugin-typescript";
@@ -14,7 +15,9 @@ export default {
     paths: {
       "monaco-editor": "vs/editor/editor.main",
     },
-    preferConst: true,
+    generatedCode: {
+      preferConst: true,
+    }
   },
   context: "window",
   external: ["monaco-editor", "require", "jszip"],
@@ -35,6 +38,11 @@ export default {
         await Promise.all([
           fs.copyFile("node_modules/requirejs/require.js", `${out}/require.js`),
         ]);
+      },
+      async transform(code, file) {
+        // Allow loading files in /mount.
+        const ext = path.extname(file);
+        return ext == '.agda' ? `export default ${JSON.stringify(code)};\n` : null;
       },
     },
   ],

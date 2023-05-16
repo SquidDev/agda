@@ -8,6 +8,8 @@ module Main (main) where
 
 import Control.Monad.State
 import Control.Monad.IO.Class
+import Control.Concurrent.STM.TChan
+import Control.Concurrent.STM.TVar
 
 import qualified Data.ByteString as BS
 import qualified Data.ByteString.Lazy.Char8 as BL
@@ -42,7 +44,10 @@ tcState = unsafePerformIO $ newIORef initState
 {-# NOINLINE commandState #-}
 -- | The state of the current Command state
 commandState :: IORef CommandState
-commandState = unsafePerformIO $ newIORef (initCommandState (error "Command queue should not be used"))
+commandState = unsafePerformIO $ do
+  commands <- newTChanIO
+  abort    <- newTVarIO Nothing
+  newIORef $ initCommandState (CommandQueue commands abort)
 
 -- | Run the TCM monad in the global state.
 runGlobalTCM :: TCM a -> IO a

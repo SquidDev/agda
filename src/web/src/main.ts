@@ -1,76 +1,58 @@
-import { WASI, Fd, PreopenDirectory, File, Directory } from "@bjorn3/browser_wasi_shim";
-import type { Iovec } from "@bjorn3/browser_wasi_shim/typings/wasi_defs";
+import { WASI } from "@wasmer/wasi";
+import { WasmFs } from "@wasmer/wasmfs";
+
+import prim from "../../data/lib/prim/Agda/Primitive.agda"
 
 
-const makeBuffered = (callback: (msg: string) => void): ((msg: string) => void) => {
-  let buffer = "";
-  return text => {
-    buffer += text;
-
-    const i = buffer.lastIndexOf("\n");
-    if (i >= 0) {
-      callback(buffer.substring(0, i));
-      buffer = buffer.substring(i + 1);
-    }
-  }
-}
-class TextFd extends Fd {
-  private readonly callback: (msg: string) => void;
-  private readonly decoder: TextDecoder;
-  constructor(callback: (msg: string) => void) {
-    super();
-
-    this.callback = callback;
-    this.decoder = new TextDecoder();
-  }
-  fd_write(view8: Uint8Array, iovs: [Iovec]): { ret: number, nwritten: number } {
-    let nwritten = 0;
-    let text = "";
-    for (let iovec of iovs) {
-      text += this.decoder.decode(view8.slice(iovec.buf, iovec.buf + iovec.buf_len));
-      nwritten += iovec.buf_len;
-    }
-
-    this.callback(text);
-    return { ret: 0, nwritten };
-  }
-}
+const makeWriter = (callback: (msg: string) => void) => (buffer: Buffer) => {
+  callback(buffer.toString());
+  return buffer.length;
+};
 
 (async () => {
   console.log("Downloading");
   let wasm = await WebAssembly.compileStreaming(fetch("dist/agda.wasm"));
   console.log("Initialising");
 
+  const fs = new WasmFs();
+  fs.volume.fds[1].write = makeWriter(x => {
+    const msg = x.trimEnd();
+    if (msg.length > 0) console.log(msg);
+  });
+  fs.volume.fds[2].write = makeWriter(x => console.error(x.trimEnd()));
+  fs.volume.fromJSON({
+    "/": null,
+    "/agda": null,
+    "/agda/lib": null,
+    "/agda/lib/prim/Agda/Primitive.agda": prim,
+    "/file.agda": `{-# OPTIONS -v10 #-}\ndata ⊤ : Set where\n  tt : ⊤\n`
+  });
+  console.log("Volume", fs.volume, fs.volume.toJSON());
 
-  let w = new WASI(["agda"], [
-    "Agda_datadir=/agda"
-  ], [
-    new Fd(),
-    new TextFd(x => console.log("[Stdout] " + x)),
-    new TextFd(makeBuffered(x => console.error(x))),
-    new PreopenDirectory(".", {
-      "test.agda": new File(new TextEncoder().encode(`data True : Set where\n  tt : True`)),
-    }),
-    new PreopenDirectory("/", {
-      "agda": new Directory({
-        "lib": new Directory({
-
-        }),
-      }),
-    }),
-  ]);
-  let inst = await WebAssembly.instantiate(wasm, {
-    // "wasi_snapshot_preview1": w.wasiImport
-    "wasi_snapshot_preview1": new Proxy(w.wasiImport, {
-      get(target, prop, receiver) {
-        let func = Reflect.get(target, prop, receiver);
-        return (...args: any[]) => {
-          const res = Reflect.apply(func, receiver, args);
-          console.log(prop, "(", ...args, ") => ", res);
-          return res;
-        };
+  const wasi = new WASI({
+    bindings: {
+      ...WASI.defaultBindings,
+      fs: fs.fs,
+      path: {
+        resolve: (l: string, r: string): string => {
+          if (r.startsWith("/")) return r;
+          return l.endsWith("/") ? `${l}${r}` : `${l}/${r}`;
+        },
+        relative: (l: string, r: string): string => {
+          if (l == r) return "."
+          console.log("resolve", l, r);
+          return l + "/" + r;
+        }
       }
-    }),
+    },
+    args: ["agda"],
+    env: { "Agda_datadir": "/agda" },
+    preopens: { "/": "/" },
+    // traceSyscalls: true,
+  });
+
+  const inst = await WebAssembly.instantiate(wasm, {
+    "wasi_snapshot_preview1": wasi.wasiImport,
   });
   const instTyped = inst as typeof inst & {
     exports: {
@@ -81,10 +63,11 @@ class TextFd extends Fd {
       "malloc": (len: number) => number,
     }
   };
-  w.initialize(instTyped);
+  wasi.start(instTyped);
 
   console.log("Initialising (GHC)");
 
+  instTyped.exports._initialize();
   instTyped.exports["wizer.initialize"]();
 
   console.log("Loading file");
