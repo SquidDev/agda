@@ -9,11 +9,12 @@ const makeWriter = (callback: (msg: string) => void) => (buffer: Buffer) => {
   return buffer.length;
 };
 
-(async () => {
-  console.log("Downloading");
-  let wasm = await WebAssembly.compileStreaming(fetch("agda.wasm"));
-  console.log("Initialising");
+const log = (message: string) => {
+  console.log(message);
+  postMessage({ "kind": "RunningInfo", message });
+};
 
+(async () => {
   const fs = new WasmFs();
   fs.volume.fds[1].write = makeWriter(x => {
     const msg = x.trimEnd();
@@ -61,10 +62,12 @@ const makeWriter = (callback: (msg: string) => void) => (buffer: Buffer) => {
     // traceSyscalls: true,
   });
 
-  const inst = await WebAssembly.instantiate(wasm, {
+  log("Downloading and compiling")
+
+  const module = await WebAssembly.instantiateStreaming(fetch("agda.wasm"), {
     "wasi_snapshot_preview1": wasi.wasiImport,
   });
-  const instTyped = inst as typeof inst & {
+  const instance = module.instance as typeof module & {
     exports: {
       memory: WebAssembly.Memory,
       _initialize: () => void,
@@ -73,22 +76,23 @@ const makeWriter = (callback: (msg: string) => void) => (buffer: Buffer) => {
       "malloc": (len: number) => number,
     }
   };
-  wasi.start(instTyped);
+  wasi.start(instance);
 
-  console.log("Initialising (GHC)");
+  log("Initialising (Base)");
+  instance.exports._initialize();
 
-  instTyped.exports._initialize();
-  instTyped.exports["wizer.initialize"]();
+  log("Initialising (GHC)");
+  instance.exports["wizer.initialize"]();
 
-  console.log("Loading file");
+  log("Loading file");
 
-  const { malloc, memory, agdaRun } = instTyped.exports;
+  const { malloc, memory, agdaRun } = instance.exports;
   const cmd = `IOTCM "/file.agda" NonInteractive Direct (Cmd_load "/file.agda" [])\0`;
   const ptr = malloc(cmd.length);
   new TextEncoder().encodeInto(cmd, new Uint8Array(memory.buffer, ptr, cmd.length));
   agdaRun(ptr, cmd.length - 1);
 
-  console.log("Done.");
+  log("Done.");
 })();
 
 export default "";

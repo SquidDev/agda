@@ -759,12 +759,23 @@ debug : ## Print debug information.
 	@echo "Run \`make -pq\` to get a detailed report."
 	@echo
 
+src/web/node_modules : src/web/package-lock.json
+	cd src/web && npm ci
+
 .PHONY : wasm
-wasm :
+wasm : src/web/node_modules
 	wasm32-wasi-cabal build -- agda
-# wizer --allow-wasi --wasm-bulk-memory true ./dist-newstyle/build/wasm32-wasi/ghc-9.7.20230425/Agda-2.6.4/x/agda/build/agda/agda.wasm \
-#		-o agda.wizer.wasm --mapdir /::./tmp
+# I couldn't get wizer to work, so just copy for now.
 	cp ./dist-newstyle/build/wasm32-wasi/ghc-9.7.20230425/Agda-2.6.4/x/agda/build/agda/agda.wasm agda.wizer.wasm
+# env Agda_datadir=src/data wizer --inherit-env=true --allow-wasi --wasm-bulk-memory true \
+# 	./dist-newstyle/build/wasm32-wasi/ghc-9.7.20230425/Agda-2.6.4/x/agda/build/agda/agda.wasm \
+# 	-o agda.wizer.wasm --dir /
 	wasm-opt -O1 agda.wizer.wasm -o agda.opt.wasm
 	cp agda.opt.wasm src/web/dist/agda.wasm
+	cd src/web && npm run rollup
+
+.PHONY : wasm-host
+wasm-host :
+	python -m http.server 8080 -d src/web --bind 127.0.0.1
+
 # EOF

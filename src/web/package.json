@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prepare:rollup": "rollup -c",
+    "rollup": "rollup -c",
     "watch": "rollup -c --watch"
   },
   "author": "",
