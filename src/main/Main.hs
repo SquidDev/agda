@@ -12,7 +12,6 @@ import Control.Concurrent.STM.TChan
 import Control.Concurrent.STM.TVar
 
 import qualified Data.ByteString as BS
-import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Char8 as BC
 import qualified Data.ByteString.Unsafe as BU
 import qualified Data.Text as T
@@ -67,7 +66,9 @@ agdaSetup = do
 
   where
     write :: Response -> TCM ()
-    write x = encodeTCM x >>= liftIO . BL.putStrLn . encode
+    write x = do
+      json <- encodeTCM x
+      liftIO $ BU.unsafeUseAsCStringLen (BS.toStrict $ encode json) (uncurry agdaInteract)
 
 foreign export ccall agdaSetup :: IO ()
 
@@ -92,3 +93,5 @@ runCommand c = do
   (((), commandState'), tcState')  <- liftIO $ runTCM tcEnv tcState $ runStateT (runInteraction c) commandState
   putTC tcState'
   put commandState'
+
+foreign import ccall agdaInteract :: Ptr CChar -> Int -> IO ()

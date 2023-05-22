@@ -19,15 +19,7 @@ const log = (message: string) => {
   fs.volume.fds[1].write = makeWriter(x => {
     const msg = x.trimEnd();
     if (msg.length == 0) return;
-    let message: string;
-    try {
-      message = JSON.parse(msg);
-    } catch (e) {
-      console.error(e);
-      return;
-    }
-
-    postMessage(message);
+    console.log(msg);
   });
   fs.volume.fds[2].write = makeWriter(x => console.error(x.trimEnd()));
   fs.volume.fromJSON({
@@ -37,7 +29,7 @@ const log = (message: string) => {
     "/agda/lib/prim/Agda/Primitive.agda": prim,
     "/agda/lib/prim/Agda/Primitive/Cubical.agda": primCubical,
     // TODO: This should be driven from user input.
-    "/file.agda": `{-# OPTIONS -v10 #-}\ndata ⊤ : Set where\n  tt : ⊤\n`
+    "/file.agda": `data ⊤ : Set where\n  tt : ⊤\n`
   });
 
   const wasi = new WASI({
@@ -64,8 +56,21 @@ const log = (message: string) => {
 
   log("Downloading and compiling")
 
-  const module = await WebAssembly.instantiateStreaming(fetch("agda.wasm"), {
+  const module = await WebAssembly.instantiateStreaming(fetch("agda.wasm", { "cache": "no-cache" }), {
     "wasi_snapshot_preview1": wasi.wasiImport,
+    "agda": {
+      "interact": (addr: number, len: number) => {
+        const text = new TextDecoder().decode(wasi.memory.buffer.slice(addr, addr + len));
+        let message;
+        try {
+          message = JSON.parse(text);
+        } catch (e) {
+          console.error(e);
+          return;
+        }
+        postMessage(message);
+      },
+    },
   });
   const instance = module.instance as typeof module & {
     exports: {
@@ -74,7 +79,7 @@ const log = (message: string) => {
       "wizer.initialize": () => void,
       "agdaRun": (ptr: number, len: number) => void,
       "malloc": (len: number) => number,
-    }
+    },
   };
   wasi.start(instance);
 
