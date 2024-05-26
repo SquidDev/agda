@@ -131,6 +131,10 @@ import Agda.TypeChecking.Warnings (WhichWarnings(AllWarnings))
 import Agda.Interaction.Options.Warnings (unsolvedWarnings)
 import Agda.Interaction.MakeCase (makeCase)
 
+import qualified Data.ByteString as BS
+import qualified Data.ByteString.Lazy as BSL
+import Data.ByteString.Builder.Extra (defaultChunkSize)
+
 syncOptions :: TextDocumentSyncOptions
 syncOptions = TextDocumentSyncOptions
   { _openClose         = Just True
